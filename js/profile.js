@@ -13,6 +13,14 @@ if (!token) {
   location.href = "auth.html";
 }
 
+/* ===== NAVIGATION ===== */
+/**
+ * Navigate back to dashboard
+ */
+function goToDashboard() {
+  location.href = "dashboard.html";
+}
+
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
  * Sanitizes user input to prevent XSS attacks

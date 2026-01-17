@@ -32,67 +32,94 @@
   </head>
 
   <body>
+    <!-- Back Button -->
+    <button class="back-button" onclick="goToHome()" aria-label="Go back to home">
+      <i class="fa fa-arrow-left"></i> Back
+    </button>
+
     <div class="card">
       <!-- Header -->
-      <div class="brand">Maviya Attar QuizMaster</div>
-      <div class="subtitle">Enter quiz code to join a quiz</div>
+      <div class="brand">⭐ Maviya Attar QuizMaster</div>
+      
+      <!-- Step 1: Enter Quiz Code -->
+      <div id="step1" class="step-container">
+        <div class="subtitle">Enter quiz code to join</div>
+        
+        <input
+          class="input"
+          id="code"
+          placeholder="Quiz Code (e.g. ABC123)"
+          type="text"
+          maxlength="10"
+          aria-label="Quiz code"
+          spellcheck="false"
+          autocomplete="off"
+        />
 
-      <!-- Form Inputs -->
-      <input
-        class="input"
-        id="code"
-        placeholder="Quiz Code (e.g. ABC123)"
-        type="text"
-        maxlength="10"
-        aria-label="Quiz code"
-        spellcheck="false"
-        autocomplete="off"
-      />
-      <input
-        class="input"
-        id="name"
-        placeholder="Your Name"
-        type="text"
-        maxlength="50"
-        aria-label="Your name"
-        autocomplete="name"
-      />
-      <input
-        class="input"
-        id="roll"
-        placeholder="Roll Number"
-        type="text"
-        maxlength="20"
-        aria-label="Your roll number"
-        autocomplete="off"
-      />
-      <input
-        class="input"
-        id="branch"
-        placeholder="Branch"
-        type="text"
-        maxlength="50"
-        aria-label="Your branch"
-        autocomplete="off"
-      />
+        <button
+          class="btn"
+          onclick="verifyCode()"
+          aria-label="Verify quiz code"
+          type="button"
+        >
+          <i class="fa fa-arrow-right"></i> Continue
+        </button>
 
-      <!-- Submit Button -->
-      <button
-        class="btn"
-        onclick="joinQuiz()"
-        aria-label="Join quiz"
-        type="button"
-      >
-        <i class="fa fa-arrow-right"></i> Join Quiz
-      </button>
+        <!-- Helper Text -->
+        <div class="helper-text">
+          Not registered? <a href="auth.html">Create an account</a>
+        </div>
+      </div>
+
+      <!-- Step 2: Enter Student Details (Hidden Initially) -->
+      <div id="step2" class="step-container" style="display: none;">
+        <button class="back-link" onclick="backToStep1()">
+          <i class="fa fa-arrow-left"></i> Change Code
+        </button>
+        
+        <div class="subtitle" style="margin-top: 10px;">Enter your details</div>
+        <div class="quiz-code-display" id="quizCodeDisplay"></div>
+
+        <input
+          class="input"
+          id="name"
+          placeholder="Your Name"
+          type="text"
+          maxlength="50"
+          aria-label="Your name"
+          autocomplete="name"
+        />
+        <input
+          class="input"
+          id="roll"
+          placeholder="Roll Number"
+          type="text"
+          maxlength="20"
+          aria-label="Your roll number"
+          autocomplete="off"
+        />
+        <input
+          class="input"
+          id="branch"
+          placeholder="Branch"
+          type="text"
+          maxlength="50"
+          aria-label="Your branch"
+          autocomplete="off"
+        />
+
+        <button
+          class="btn"
+          onclick="joinQuiz()"
+          aria-label="Join quiz"
+          type="button"
+        >
+          <i class="fa fa-check"></i> Join Quiz
+        </button>
+      </div>
 
       <!-- Status Message -->
       <div id="msg" class="msg" role="status" aria-live="polite"></div>
-
-      <!-- Helper Text -->
-      <div class="helper-text">
-        Not registered? <a href="auth.html">Create an account</a>
-      </div>
     </div>
 
     <!-- External JavaScript -->

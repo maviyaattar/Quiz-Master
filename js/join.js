@@ -7,6 +7,112 @@
 /* ===== CONFIGURATION ===== */
 const API = "https://quiz-backend-production-4aaf.up.railway.app";
 
+/* ===== STATE MANAGEMENT ===== */
+let verifiedCode = null;
+
+/* ===== NAVIGATION ===== */
+/**
+ * Navigate back to home page
+ */
+function goToHome() {
+  location.href = "index.html";
+}
+
+/**
+ * Go back to step 1 (code entry)
+ */
+function backToStep1() {
+  document.getElementById("step1").style.display = "block";
+  document.getElementById("step2").style.display = "none";
+  verifiedCode = null;
+  showMessage("", "info");
+}
+
+/* ===== STEP 1: VERIFY QUIZ CODE ===== */
+/**
+ * Verify the quiz code before showing the form
+ */
+async function verifyCode() {
+  const codeInput = document.getElementById("code");
+  const code = sanitizeInput(codeInput.value.trim().toUpperCase());
+  const btn = event.target;
+
+  // Clear previous message
+  showMessage("", "info");
+
+  // Validation
+  if (!code) {
+    showMessage("Please enter a quiz code", "error");
+    return;
+  }
+
+  if (!isValidCode(code)) {
+    showMessage("Invalid quiz code format (3-10 alphanumeric characters)", "error");
+    return;
+  }
+
+  // Disable button during verification
+  btn.disabled = true;
+  btn.classList.add("loading");
+  showMessage("Verifying quiz code...", "info");
+
+  try {
+    // Check if quiz exists and is active
+    const response = await fetch(`${API}/api/quiz/join/${code}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ rollNo: "VERIFY" }), // Dummy request to check status
+    });
+
+    const data = await response.json();
+
+    btn.disabled = false;
+    btn.classList.remove("loading");
+
+    if (!response.ok) {
+      showMessage(data.msg || "Quiz not found. Please check the code.", "error");
+      return;
+    }
+
+    // Check quiz status
+    if (data.status === "created") {
+      showMessage("⏳ Quiz not started yet. Please try later.", "warning");
+      return;
+    }
+
+    if (data.status === "ended") {
+      showMessage("❌ This quiz has already ended", "error");
+      return;
+    }
+
+    if (data.status === "allowed") {
+      // Code is valid and quiz is active
+      verifiedCode = code;
+      showMessage("✓ Quiz code verified!", "success");
+      
+      // Move to step 2
+      setTimeout(() => {
+        document.getElementById("step1").style.display = "none";
+        document.getElementById("step2").style.display = "block";
+        document.getElementById("quizCodeDisplay").innerHTML = 
+          `<strong>Quiz Code:</strong> <span class="code-badge">${escapeHtml(code)}</span>`;
+        document.getElementById("name").focus();
+        showMessage("", "info");
+      }, 800);
+      return;
+    }
+
+    showMessage("Unexpected response from server", "warning");
+  } catch (err) {
+    console.error("Error verifying quiz code:", err);
+    showMessage("Unable to connect to server. Please try again.", "error");
+    btn.disabled = false;
+    btn.classList.remove("loading");
+  }
+}
+
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
  * Sanitizes user input to prevent XSS attacks
@@ -119,15 +225,21 @@ function showMessage(message, type = "info") {
  * Join a quiz with provided credentials
  */
 async function joinQuiz() {
+  // Use verified code from step 1
+  if (!verifiedCode) {
+    showMessage("Please verify quiz code first", "error");
+    backToStep1();
+    return;
+  }
+
   // Get input elements
-  const codeInput = document.getElementById("code");
   const nameInput = document.getElementById("name");
   const rollInput = document.getElementById("roll");
   const branchInput = document.getElementById("branch");
-  const btn = document.querySelector(".btn");
+  const btn = event.target;
 
   // Get and sanitize inputs
-  const code = sanitizeInput(codeInput.value.trim().toUpperCase());
+  const code = verifiedCode;
   const name = sanitizeInput(nameInput.value.trim());
   const rollNo = sanitizeInput(rollInput.value.trim());
   const branch = sanitizeInput(branchInput.value.trim());
@@ -136,13 +248,8 @@ async function joinQuiz() {
   showMessage("", "info");
 
   // ===== VALIDATION =====
-  if (!code || !name || !rollNo || !branch) {
+  if (!name || !rollNo || !branch) {
     showMessage("Please fill all fields", "error");
-    return;
-  }
-
-  if (!isValidCode(code)) {
-    showMessage("Invalid quiz code format", "error");
     return;
   }
 
@@ -164,6 +271,7 @@ async function joinQuiz() {
   // Disable button during submission
   btn.disabled = true;
   btn.classList.add("loading");
+  showMessage("Joining quiz...", "info");
 
   try {
     // ===== API REQUEST =====
