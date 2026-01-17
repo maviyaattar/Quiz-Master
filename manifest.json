@@ -1,0 +1,21 @@
+{
+  "name": "QuizMaster - Professional Quiz Platform",
+  "short_name": "QuizMaster",
+  "description": "Create, manage, and take professional online quizzes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#5b6cff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

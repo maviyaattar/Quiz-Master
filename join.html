@@ -1,179 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Join Quiz | QuizMaster</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Join a quiz using Maviya Attar's Quiz Master platform"
+    />
+    <meta name="theme-color" content="#5b6cff" />
+    <title>Join Quiz | Maviya Attar - Quiz Master</title>
 
-  <!-- Icons -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <style>
-    :root{
-      --primary:#5b6cff;
-      --secondary:#8f5bff;
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --radius:18px;
-      --danger:#ef4444;
-      --success:#22c55e;
-    }
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-QDA5QrzIAqmF+ZKSf96z8QFhOkM/n4ZZrGy0mPkIgfcegIjWKc5ouNQsfyBDVToTxliqcuqRPYsHiKaPDrga=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:"Poppins",sans-serif;
-    }
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/join.css" />
+  </head>
 
-    body{
-      background:linear-gradient(180deg,#f5f7fb,#eef0ff);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--text);
-    }
+  <body>
+    <div class="card">
+      <!-- Header -->
+      <div class="brand">Maviya Attar QuizMaster</div>
+      <div class="subtitle">Enter quiz code to join a quiz</div>
 
-    .card{
-      width:100%;
-      max-width:420px;
-      background:#fff;
-      padding:28px;
-      border-radius:var(--radius);
-      box-shadow:0 18px 35px rgba(0,0,0,.12);
-    }
+      <!-- Form Inputs -->
+      <input
+        class="input"
+        id="code"
+        placeholder="Quiz Code (e.g. ABC123)"
+        type="text"
+        maxlength="10"
+        aria-label="Quiz code"
+        spellcheck="false"
+        autocomplete="off"
+      />
+      <input
+        class="input"
+        id="name"
+        placeholder="Your Name"
+        type="text"
+        maxlength="50"
+        aria-label="Your name"
+        autocomplete="name"
+      />
+      <input
+        class="input"
+        id="roll"
+        placeholder="Roll Number"
+        type="text"
+        maxlength="20"
+        aria-label="Your roll number"
+        autocomplete="off"
+      />
+      <input
+        class="input"
+        id="branch"
+        placeholder="Branch"
+        type="text"
+        maxlength="50"
+        aria-label="Your branch"
+        autocomplete="off"
+      />
 
-    .brand{
-      text-align:center;
-      font-size:22px;
-      font-weight:800;
-      color:var(--primary);
-      margin-bottom:6px;
-    }
+      <!-- Submit Button -->
+      <button
+        class="btn"
+        onclick="joinQuiz()"
+        aria-label="Join quiz"
+        type="button"
+      >
+        <i class="fa fa-arrow-right"></i> Join Quiz
+      </button>
 
-    .subtitle{
-      text-align:center;
-      color:var(--muted);
-      margin-bottom:24px;
-      font-size:14px;
-    }
+      <!-- Status Message -->
+      <div id="msg" class="msg" role="status" aria-live="polite"></div>
 
-    .input{
-      width:100%;
-      padding:14px 16px;
-      border-radius:14px;
-      border:1px solid #e5e7eb;
-      margin-bottom:14px;
-      font-size:14px;
-    }
+      <!-- Helper Text -->
+      <div class="helper-text">
+        Not registered? <a href="auth.html">Create an account</a>
+      </div>
+    </div>
 
-    .btn{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:40px;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
-      font-size:15px;
-      margin-top:6px;
-    }
-
-    .msg{
-      margin-top:14px;
-      font-size:14px;
-      text-align:center;
-    }
-
-    .error{color:var(--danger)}
-    .success{color:var(--success)}
-  </style>
-</head>
-
-<body>
-
-<div class="card">
-  <div class="brand">QuizMaster</div>
-  <div class="subtitle">Enter quiz code to join</div>
-
-  <input class="input" id="code" placeholder="Quiz Code (e.g. ABC123)">
-  <input class="input" id="name" placeholder="Your Name">
-  <input class="input" id="roll" placeholder="Roll Number">
-  <input class="input" id="branch" placeholder="Branch">
-
-  <button class="btn" onclick="joinQuiz()">
-    <i class="fa fa-arrow-right"></i> Join Quiz
-  </button>
-
-  <div id="msg" class="msg"></div>
-</div>
-
-<script>
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
-
-async function joinQuiz(){
-  const code = document.getElementById("code").value.trim().toUpperCase();
-  const name = document.getElementById("name").value.trim();
-  const rollNo = document.getElementById("roll").value.trim();
-  const branch = document.getElementById("branch").value.trim();
-  const msg = document.getElementById("msg");
-
-  msg.innerText = "";
-  msg.className = "msg";
-
-  if(!code || !name || !rollNo || !branch){
-    msg.innerText = "Fill all fields";
-    msg.classList.add("error");
-    return;
-  }
-
-  try{
-    const res = await fetch(`${API}/api/quiz/join/${code}`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({ rollNo })
-    });
-
-    const data = await res.json();
-
-    if(!res.ok){
-      msg.innerText = data.msg || "Unable to join";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "created"){
-      msg.innerText = "⏳ Quiz not started yet";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "ended"){
-      msg.innerText = "❌ Quiz already ended";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "allowed"){
-      localStorage.setItem("joiner", JSON.stringify({
-        code, name, rollNo, branch
-      }));
-      location.href = "attempt.html?code=" + code;
-    }
-
-  }catch(err){
-    msg.innerText = "Server error. Try again.";
-    msg.classList.add("error");
-  }
-}
-</script>
-
-</body>
+    <!-- External JavaScript -->
+    <script src="js/join.js"></script>
+  </body>
 </html>

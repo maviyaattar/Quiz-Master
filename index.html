@@ -1,10 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>QuizMaster</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="QuizMaster - Professional online quiz platform for creating and managing tests">
+  <meta name="keywords" content="quiz, test, online exam, education, assessment">
+  <meta name="author" content="Maviya Attar">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="QuizMaster - Create and Manage Quizzes">
+  <meta property="og:description" content="Professional online quiz platform">
+  <meta property="og:type" content="website">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#5b6cff">
+  
+  <title>QuizMaster - Professional Online Quiz Platform</title>
+  
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -13,19 +41,19 @@
   <p>Create quizzes, host live tests and view instant results.</p>
 
   <div class="hero-actions">
-    <a class="btn btn-primary" href="Auth.html">Get Started</a>
+    <a class="btn btn-primary" href="auth.html">Get Started</a>
     <a class="btn btn-outline" href="#roles">Explore</a>
   </div>
 </section>
 
 <section class="roles" id="roles">
-  <div class="role-card card" onclick="location.href='Auth.html'">
+  <div class="role-card card" onclick="location.href='auth.html'">
     <i class="fa-solid fa-chalkboard-user"></i>
     <h3>Creator</h3>
     <p>Create and manage quizzes professionally.</p>
   </div>
 
-  <div class="role-card card">
+  <div class="role-card card" onclick="location.href='join.html'">
     <i class="fa-solid fa-user-graduate"></i>
     <h3>Join Quiz</h3>
     <p>Enter code, attempt quiz and submit answers.</p>
