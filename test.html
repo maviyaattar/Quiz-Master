@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Details | QuizMaster</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --primary:#5b6cff;
+      --secondary:#8f5bff;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --radius:18px;
+      --danger:#ef4444;
+      --success:#22c55e;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+
+    body{
+      background:linear-gradient(180deg,#f5f7fb,#eef0ff);
+      min-height:100vh;
+      color:var(--text);
+    }
+
+    .top-bar{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:16px 22px;
+      background:#fff;
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+    }
+
+    .back-btn{font-size:20px;color:var(--primary);cursor:pointer}
+
+    .container{max-width:1200px;margin:auto;padding:26px}
+
+    .product-grid{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:30px;
+    }
+
+    .side-card,.details-card{
+      background:#fff;
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 18px 35px rgba(0,0,0,.12);
+    }
+
+    .badge{
+      padding:6px 14px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      color:#fff;
+      display:inline-block;
+      margin-bottom:10px;
+    }
+
+    .created{background:#fbbf24}
+    .live{background:var(--success)}
+    .ended{background:var(--danger)}
+
+    .meta-box{
+      background:#f6f7ff;
+      padding:14px;
+      border-radius:14px;
+      margin-top:14px;
+      font-size:14px;
+      word-break:break-all;
+    }
+
+    .copy-btn{
+      margin-top:8px;
+      padding:8px 14px;
+      border:none;
+      border-radius:20px;
+      background:#eef0ff;
+      color:var(--primary);
+      cursor:pointer;
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .start-btn{
+      margin-top:16px;
+      width:100%;
+      padding:14px;
+      border-radius:40px;
+      border:none;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .delete-btn{
+      margin-top:12px;
+      width:100%;
+      padding:12px;
+      border-radius:40px;
+      border:none;
+      background:var(--danger);
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .tabs{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+
+    .tab-btn{
+      padding:10px 22px;
+      border-radius:30px;
+      border:2px solid var(--primary);
+      background:#fff;
+      color:var(--primary);
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .tab-btn.active{
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+    }
+
+    .tab-content{display:none;margin-top:16px}
+    .tab-content.active{display:block}
+
+    .list-item{
+      background:#fff;
+      padding:14px 18px;
+      border-radius:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.08);
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+
+    @media(max-width:900px){
+      .product-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="top-bar">
+  <i class="fa fa-arrow-left back-btn" onclick="goBack()"></i>
+  <h3>Quiz Overview</h3>
+</div>
+
+<div class="container">
+  <div class="product-grid">
+
+    <!-- LEFT -->
+    <div class="side-card">
+      <span id="statusBadge" class="badge created">CREATED</span>
+
+      <h3 id="quizTitle">Loading...</h3>
+      <p id="quizDesc"></p>
+
+      <div class="meta-box">
+        <strong>Quiz Code:</strong>
+        <div id="quizCode"></div>
+        <button class="copy-btn" onclick="copyText(quizCode.innerText)">Copy Code</button>
+      </div>
+
+      <div class="meta-box">
+        <strong>Join Link:</strong>
+        <div id="quizLink"></div>
+        <button class="copy-btn" onclick="copyText(quizLink.innerText)">Copy Link</button>
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">
+        <i class="fa fa-play"></i> Start Quiz
+      </button>
+
+      <button class="delete-btn" onclick="deleteQuiz()">
+        <i class="fa fa-trash"></i> Delete Quiz
+      </button>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="details-card">
+      <h2 id="detailTitle"></h2>
+      <p id="detailDesc"></p>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('participants',this)">Participants</button>
+        <button class="tab-btn" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+        <button class="tab-btn" onclick="switchTab('summary',this)">Summary</button>
+      </div>
+
+      <div id="participants" class="tab-content active"></div>
+      <div id="leaderboard" class="tab-content"></div>
+      <div id="summary" class="tab-content"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const token = localStorage.getItem("token");
+const code = new URLSearchParams(location.search).get("code");
+
+if(!token || !code) location.href="dashboard.html";
+
+function goBack(){location.href="dashboard.html";}
+function copyText(t){navigator.clipboard.writeText(t);alert("Copied!");}
+
+/* ================= LOAD QUIZ ================= */
+async function loadQuiz(){
+  const res = await fetch(`${API}/api/quiz/${code}`,{
+    headers:{Authorization:"Bearer "+token}
+  });
+  const q = await res.json();
+
+  quizTitle.innerText = q.title;
+  quizDesc.innerText = q.description;
+  detailTitle.innerText = q.title;
+  detailDesc.innerText = q.description;
+  quizCode.innerText = q.code;
+
+  quizLink.innerText = `${location.origin}/join.html?code=${q.code}`;
+  statusBadge.className = "badge "+q.status;
+  statusBadge.innerText = q.status.toUpperCase();
+}
+
+/* ================= PARTICIPANTS ================= */
+async function loadParticipants(){
+  participants.innerHTML = "Loading...";
+  const res = await fetch(`${API}/api/quiz/leaderboard/${code}`);
+  const data = await res.json();
+
+  if(!data.length){
+    participants.innerHTML = "<p>No participants yet</p>";
+    return;
+  }
+
+  participants.innerHTML = data.map((u,i)=>`
+    <div class="list-item">
+      <span>${u.name} (Roll ${u.rollNo})</span>
+      <strong>${u.score}</strong>
+    </div>
+  `).join("");
+}
+
+/* ================= LEADERBOARD ================= */
+async function loadLeaderboard(){
+  leaderboard.innerHTML = "Loading...";
+  const res = await fetch(`${API}/api/quiz/leaderboard/${code}`);
+  const data = await res.json();
+
+  if(!data.length){
+    leaderboard.innerHTML = "<p>No results yet</p>";
+    return;
+  }
+
+  leaderboard.innerHTML = data.map((u,i)=>`
+    <div class="list-item">
+      <span>#${i+1} ${u.name}</span>
+      <strong>${u.score}</strong>
+    </div>
+  `).join("");
+}
+
+/* ================= SUMMARY ================= */
+async function loadSummary(){
+  summary.innerHTML = "Loading...";
+  const res = await fetch(`${API}/api/quiz/summary/${code}`);
+  const s = await res.json();
+
+  summary.innerHTML = `
+    <div class="list-item"><span>Total Participants</span><strong>${s.total}</strong></div>
+    <div class="list-item"><span>Highest Score</span><strong>${s.highest}</strong></div>
+    <div class="list-item"><span>Average Score</span><strong>${s.average.toFixed(2)}</strong></div>
+  `;
+}
+
+/* ================= START QUIZ ================= */
+async function startQuiz(){
+  const res = await fetch(`${API}/api/quiz/start/${code}`,{
+    method:"POST",
+    headers:{Authorization:"Bearer "+token}
+  });
+  const data = await res.json();
+  alert(data.msg);
+  loadQuiz();
+}
+
+/* ================= DELETE QUIZ ================= */
+async function deleteQuiz(){
+  if(!confirm("Delete this quiz permanently?")) return;
+
+  const res = await fetch(`${API}/api/quiz/delete/${code}`,{
+    method:"DELETE",
+    headers:{Authorization:"Bearer "+token}
+  });
+
+  const data = await res.json();
+  alert(data.msg);
+  location.href="dashboard.html";
+}
+
+/* ================= TAB SWITCH ================= */
+function switchTab(tab,btn){
+  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+
+  document.getElementById(tab).classList.add("active");
+  btn.classList.add("active");
+
+  if(tab==="participants") loadParticipants();
+  if(tab==="leaderboard") loadLeaderboard();
+  if(tab==="summary") loadSummary();
+}
+
+/* ================= INIT ================= */
+loadQuiz();
+loadParticipants(); // default tab
+</script>
+</body>
+</html>
