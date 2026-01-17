@@ -690,4 +690,3 @@ function hideLoadingState() {
     loadingOverlay.remove();
   }
 }
-}

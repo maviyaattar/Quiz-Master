@@ -480,11 +480,31 @@ function showLoadingState() {
   `;
   
   loadingOverlay.innerHTML = `
-    <div class="loading-spinner"></div>
+    <div style="
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(91, 108, 255, 0.2);
+      border-top: 6px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    "></div>
     <p style="margin-top: 20px; font-size: 16px; font-weight: 600; color: var(--primary);">
       Submitting your quiz...
     </p>
   `;
+  
+  // Add spin animation if not present
+  if (!document.getElementById('spinAnimation')) {
+    const style = document.createElement('style');
+    style.id = 'spinAnimation';
+    style.textContent = `
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
   
   document.body.appendChild(loadingOverlay);
 }

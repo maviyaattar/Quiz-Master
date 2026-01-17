@@ -531,4 +531,3 @@ function showConfirmDialog(message, onConfirm) {
     }
   };
 }
-document.head.appendChild(style);
