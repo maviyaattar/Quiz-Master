@@ -91,6 +91,15 @@
             <i class="fa fa-play"></i> Start Quiz
           </button>
 
+          <!-- Edit Button -->
+          <button
+            class="edit-btn"
+            onclick="editQuiz()"
+            aria-label="Edit quiz"
+          >
+            <i class="fa fa-edit"></i> Edit Quiz
+          </button>
+
           <!-- Delete Button -->
           <button
             class="delete-btn"
@@ -150,6 +159,36 @@
             role="region"
             aria-live="polite"
           ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning Alerts Section -->
+    <div class="alerts-container">
+      <!-- Warning Alert 1: General Information -->
+      <div class="alert alert-warning">
+        <i class="fa fa-exclamation-triangle alert-icon"></i>
+        <div class="alert-content">
+          <strong class="alert-title">Important Notice</strong>
+          <p class="alert-message">Make sure to review all quiz settings before starting. Once live, participants can join immediately.</p>
+        </div>
+      </div>
+
+      <!-- Warning Alert 2: Time Reminder -->
+      <div class="alert alert-warning">
+        <i class="fa fa-clock alert-icon"></i>
+        <div class="alert-content">
+          <strong class="alert-title">Time Limit Reminder</strong>
+          <p class="alert-message">Ensure your quiz has an appropriate time limit set. Students will be auto-submitted when time expires.</p>
+        </div>
+      </div>
+
+      <!-- Warning Alert 3: Security Notice -->
+      <div class="alert alert-warning">
+        <i class="fa fa-shield-alt alert-icon"></i>
+        <div class="alert-content">
+          <strong class="alert-title">Security Enabled</strong>
+          <p class="alert-message">Anti-cheat protection is active. Tab switching during the quiz will be detected and logged.</p>
         </div>
       </div>
     </div>

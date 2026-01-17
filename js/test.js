@@ -368,6 +368,16 @@ async function deleteQuiz() {
   }
 }
 
+/* ===== EDIT QUIZ ===== */
+/**
+ * Navigate to edit quiz page
+ */
+function editQuiz() {
+  // Redirect to create page with the quiz code as a parameter
+  // This allows the create page to load the quiz for editing
+  location.href = `create.html?code=${encodeURIComponent(code)}`;
+}
+
 /* ===== TAB SWITCHING ===== */
 /**
  * Switch between tabs
