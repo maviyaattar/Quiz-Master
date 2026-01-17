@@ -23,6 +23,17 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  padding:20px;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.05);}
 }
 
 .card{
@@ -32,44 +43,7 @@ body{
   padding:28px;
   border-radius:18px;
   box-shadow:0 20px 40px rgba(0,0,0,.12);
-}
-
-.center{text-align:center}
-.hide{display:none}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Attempt Quiz | QuizMaster</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-:root{
-  --primary:#5b6cff;
-  --danger:#ef4444;
-  --bg:#f5f7fb;
-  --card:#ffffff;
-  --text:#1f2937;
-  --muted:#6b7280;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-
-body{
-  background:linear-gradient(180deg,#f5f7fb,#eef0ff);
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.card{
-  width:100%;
-  max-width:820px;
-  background:#fff;
-  padding:28px;
-  border-radius:18px;
-  box-shadow:0 20px 40px rgba(0,0,0,.12);
+  animation:fadeIn 0.5s ease-out;
 }
 
 .center{text-align:center}
@@ -99,10 +73,13 @@ body{
   border-radius:14px;
   margin-bottom:12px;
   cursor:pointer;
-  transition:.2s;
+  transition:all 0.2s ease;
 }
 
-.option:hover{border-color:var(--primary)}
+.option:hover{
+  border-color:var(--primary);
+  transform:translateX(4px);
+}
 
 .option.active{
   background:#eef0ff;
@@ -123,6 +100,16 @@ body{
   color:#fff;
   font-weight:600;
   cursor:pointer;
+  transition:all 0.3s ease;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(91, 108, 255, 0.3);
+}
+
+.btn:active{
+  transform:translateY(0);
 }
 
 .btn.outline{
@@ -137,6 +124,12 @@ body{
   color:var(--muted);
   text-align:center;
 }
+
+.wait-icon{
+  font-size:64px;
+  animation:pulse 2s infinite;
+  margin-bottom:20px;
+}
 </style>
 </head>
 
@@ -144,8 +137,20 @@ body{
 
 <!-- WAIT -->
 <div class="card center" id="waitScreen">
-  <h2>⏳ Waiting for host to start quiz</h2>
-  <p>Please stay on this page</p>
+  <div class="wait-icon">⏳</div>
+  <h2>Waiting for host to start quiz</h2>
+  <p style="margin-top:10px;color:var(--muted);">Please stay on this page. The quiz will start automatically.</p>
+</div>
+
+<!-- QUIZ ENDED -->
+<div class="card center hide" id="endedScreen">
+  <div style="font-size:64px;margin-bottom:20px;">❌</div>
+  <h2>Quiz Already Ended</h2>
+  <p style="margin-top:10px;color:var(--muted);">This quiz has already ended. You can no longer attempt it.</p>
+  <br>
+  <div class="footer">
+    <i class="fa fa-code"></i> Developed by <strong>Maviya Attar</strong>
+  </div>
 </div>
 
 <!-- QUIZ -->
@@ -159,7 +164,7 @@ body{
 
   <div class="nav-btns">
     <button class="btn outline" onclick="prevQuestion()">Previous</button>
-    <button class="btn" onclick="nextQuestion()">Next</button>
+    <button class="btn" id="nextBtn" onclick="nextQuestion()">Next</button>
   </div>
 
   <div class="footer">
@@ -169,8 +174,9 @@ body{
 
 <!-- THANK YOU -->
 <div class="card center hide" id="thankScreen">
-  <h2>✅ Thank You!</h2>
-  <p>Your responses have been submitted successfully.</p>
+  <div style="font-size:64px;margin-bottom:20px;">✅</div>
+  <h2>Thank You!</h2>
+  <p style="margin-top:10px;color:var(--muted);">Your responses have been submitted successfully.</p>
   <br>
   <div class="footer">
     <i class="fa fa-code"></i> Developed by <strong>Maviya Attar</strong>
@@ -186,11 +192,21 @@ if(!code||!joiner) location.href="join.html";
 
 let questions=[],answers=[],index=0,endTime=null,timerInt=null;
 let warnings=0;
+let visibilityHandlerBound=null;
 
 /* WAIT FOR START (AUTO) */
 const poll=setInterval(async()=>{
   try{
     const r=await fetch(`${API}/api/quiz/questions/${code}`);
+    
+    // If quiz ended, show ended screen
+    if(r.status===410 || r.status===403){
+      clearInterval(poll);
+      waitScreen.classList.add("hide");
+      endedScreen.classList.remove("hide");
+      return;
+    }
+    
     if(!r.ok) return;
     const d=await r.json();
     clearInterval(poll);
@@ -201,6 +217,7 @@ const poll=setInterval(async()=>{
     waitScreen.classList.add("hide");
     quizScreen.classList.remove("hide");
 
+    setupAntiCheat();
     render();
     startTimer();
   }catch{}
@@ -234,218 +251,26 @@ function render(){
     };
     options.appendChild(d);
   });
-}
 
-function nextQuestion(){
-  if(index<questions.length-1){index++;render();}
-  else submit();
-}
-
-function prevQuestion(){
-  if(index>0){index--;render();}
-}
-
-/* SUBMIT */
-async function submit(){
-  clearInterval(timerInt);
-
-  await fetch(`${API}/api/quiz/submit/${code}`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({...joiner,answers})
-  });
-
-  quizScreen.classList.add("hide");
-  thankScreen.classList.remove("hide");
-  localStorage.removeItem("joiner");
-}
-
-/* ANTI CHEAT (3 WARNINGS) */
-function warn(){
-  warnings++;
-  alert(`Warning ${warnings}/3: Do not leave the exam screen`);
-
-  if(warnings>=3){
-    alert("Too many violations. Submitting quiz.");
-    submit();
+  // Update button text on last question
+  const nextBtn=document.getElementById("nextBtn");
+  if(index===questions.length-1){
+    nextBtn.innerText="Submit";
+  }else{
+    nextBtn.innerText="Next";
   }
 }
 
-window.onblur=warn;
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden) warn();
-});
-
-document.oncontextmenu=e=>e.preventDefault();
-document.oncopy=e=>e.preventDefault();
-</script>
-
-</body>
-</html>
-.timer{
-  font-size:18px;
-  font-weight:700;
-  color:var(--primary);
-  text-align:right;
-}
-
-.progress{
-  font-size:14px;
-  color:var(--muted);
-}
-
-.question{
-  font-size:20px;
-  margin:18px 0;
-  font-weight:600;
-}
-
-.option{
-  padding:14px 16px;
-  border:2px solid #e5e7eb;
-  border-radius:14px;
-  margin-bottom:12px;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.option:hover{border-color:var(--primary)}
-
-.option.active{
-  background:#eef0ff;
-  border-color:var(--primary);
-}
-
-.nav-btns{
-  display:flex;
-  justify-content:space-between;
-  margin-top:20px;
-}
-
-.btn{
-  padding:12px 24px;
-  border:none;
-  border-radius:30px;
-  background:var(--primary);
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.btn.outline{
-  background:#fff;
-  color:var(--primary);
-  border:2px solid var(--primary);
-}
-
-.footer{
-  margin-top:18px;
-  font-size:13px;
-  color:var(--muted);
-  text-align:center;
-}
-</style>
-</head>
-
-<body>
-
-<!-- WAIT -->
-<div class="card center" id="waitScreen">
-  <h2>⏳ Waiting for host to start quiz</h2>
-  <p>Please stay on this page</p>
-</div>
-
-<!-- QUIZ -->
-<div class="card hide" id="quizScreen">
-  <div class="timer" id="timer"></div>
-  <div class="progress" id="progress"></div>
-  <hr><br>
-
-  <div class="question" id="question"></div>
-  <div id="options"></div>
-
-  <div class="nav-btns">
-    <button class="btn outline" onclick="prevQuestion()">Previous</button>
-    <button class="btn" onclick="nextQuestion()">Next</button>
-  </div>
-
-  <div class="footer">
-    <i class="fa fa-code"></i> Developed by <strong>Maviya Attar</strong>
-  </div>
-</div>
-
-<!-- THANK YOU -->
-<div class="card center hide" id="thankScreen">
-  <h2>✅ Thank You!</h2>
-  <p>Your responses have been submitted successfully.</p>
-  <br>
-  <div class="footer">
-    <i class="fa fa-code"></i> Developed by <strong>Maviya Attar</strong>
-  </div>
-</div>
-
-<script>
-const API="https://quiz-backend-production-4aaf.up.railway.app";
-const code=new URLSearchParams(location.search).get("code");
-const joiner=JSON.parse(localStorage.getItem("joiner"));
-
-if(!code||!joiner) location.href="join.html";
-
-let questions=[],answers=[],index=0,endTime=null,timerInt=null;
-let warnings=0;
-
-/* WAIT FOR START (AUTO) */
-const poll=setInterval(async()=>{
-  try{
-    const r=await fetch(`${API}/api/quiz/questions/${code}`);
-    if(!r.ok) return;
-    const d=await r.json();
-    clearInterval(poll);
-
-    questions=d.questions;
-    endTime=new Date(d.endTime);
-
-    waitScreen.classList.add("hide");
-    quizScreen.classList.remove("hide");
-
+function nextQuestion(){
+  if(index<questions.length-1){
+    index++;
     render();
-    startTimer();
-  }catch{}
-},3000);
-
-/* TIMER */
-function startTimer(){
-  timerInt=setInterval(()=>{
-    const diff=endTime-new Date();
-    if(diff<=0){submit();return;}
-    const m=Math.floor(diff/60000);
-    const s=Math.floor((diff%60000)/1000);
-    timer.innerText=`⏱ ${m}:${s.toString().padStart(2,"0")}`;
-  },1000);
-}
-
-/* RENDER */
-function render(){
-  const q=questions[index];
-  progress.innerText=`Question ${index+1} of ${questions.length}`;
-  question.innerText=q.text;
-  options.innerHTML="";
-
-  q.options.forEach((o,i)=>{
-    const d=document.createElement("div");
-    d.className="option"+(answers[index]===i?" active":"");
-    d.innerText=o;
-    d.onclick=()=>{
-      answers[index]=i;
-      render();
-    };
-    options.appendChild(d);
-  });
-}
-
-function nextQuestion(){
-  if(index<questions.length-1){index++;render();}
-  else submit();
+  }else{
+    // Confirm before submitting
+    if(confirm("Are you sure you want to submit your quiz? You won't be able to make changes after submission.")){
+      submit();
+    }
+  }
 }
 
 function prevQuestion(){
@@ -455,6 +280,9 @@ function prevQuestion(){
 /* SUBMIT */
 async function submit(){
   clearInterval(timerInt);
+
+  // Remove anti-cheat mechanisms after submission
+  removeAntiCheat();
 
   await fetch(`${API}/api/quiz/submit/${code}`,{
     method:"POST",
@@ -478,13 +306,26 @@ function warn(){
   }
 }
 
-window.onblur=warn;
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden) warn();
-});
+function setupAntiCheat(){
+  visibilityHandlerBound=visibilityHandler;
+  window.onblur=warn;
+  document.addEventListener("visibilitychange",visibilityHandlerBound);
+  document.oncontextmenu=e=>e.preventDefault();
+  document.oncopy=e=>e.preventDefault();
+}
 
-document.oncontextmenu=e=>e.preventDefault();
-document.oncopy=e=>e.preventDefault();
+function removeAntiCheat(){
+  window.onblur=null;
+  if(visibilityHandlerBound){
+    document.removeEventListener("visibilitychange",visibilityHandlerBound);
+  }
+  document.oncontextmenu=null;
+  document.oncopy=null;
+}
+
+function visibilityHandler(){
+  if(document.hidden) warn();
+}
 </script>
 
 </body>

@@ -132,6 +132,11 @@
 
     .btn:hover{
       transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(91, 108, 255, 0.3);
+    }
+
+    .btn:active{
+      transform:translateY(0);
     }
 
     /* ===== QUESTION LIST ===== */
@@ -141,6 +146,17 @@
       border-radius:14px;
       margin-bottom:12px;
       box-shadow:0 8px 18px rgba(0,0,0,.08);
+      animation:slideIn 0.3s ease-out;
+      transition:transform 0.2s ease;
+    }
+
+    .question-item:hover{
+      transform:translateX(4px);
+    }
+
+    @keyframes slideIn{
+      from{opacity:0;transform:translateX(-20px);}
+      to{opacity:1;transform:translateX(0);}
     }
 
     .question-header{
@@ -154,10 +170,16 @@
       margin-left:12px;
       cursor:pointer;
       color:var(--muted);
+      transition:all 0.2s ease;
     }
 
     .question-actions i:hover{
       color:var(--primary);
+      transform:scale(1.2);
+    }
+
+    .question-actions .fa-trash:hover{
+      color:var(--danger);
     }
 
     .correct{
@@ -219,8 +241,11 @@
       <input class="input" id="opt3" placeholder="Option D">
     </div>
 
-    <button class="btn btn-secondary" onclick="saveQuestion()">
+    <button class="btn btn-secondary" id="saveBtn" onclick="saveQuestion()">
       <i class="fa fa-save"></i> Save Question
+    </button>
+    <button class="btn btn-danger" id="cancelBtn" onclick="cancelEdit()" style="display:none;margin-left:10px;">
+      <i class="fa fa-times"></i> Cancel Edit
     </button>
   </div>
 
@@ -309,8 +334,13 @@ function renderQuestions(){
 
   if(questions.length === 0){
     list.innerHTML = "No questions added yet";
+    // Update heading
+    document.querySelector(".card:nth-child(3) h3").innerText = "Questions Added";
     return;
   }
+
+  // Update heading with count
+  document.querySelector(".card:nth-child(3) h3").innerText = `Questions Added (${questions.length})`;
 
   questions.forEach((q,i)=>{
     const div = document.createElement("div");
@@ -320,8 +350,8 @@ function renderQuestions(){
       <div class="question-header">
         <strong>Q${i+1}. ${q.text}</strong>
         <div class="question-actions">
-          <i class="fa fa-pen" onclick="editQuestion(${i})"></i>
-          <i class="fa fa-trash" onclick="deleteQuestion(${i})"></i>
+          <i class="fa fa-pen" onclick="editQuestion(${i})" title="Edit question"></i>
+          <i class="fa fa-trash" onclick="deleteQuestion(${i})" title="Delete question"></i>
         </div>
       </div>
       <div class="correct">
@@ -331,6 +361,19 @@ function renderQuestions(){
 
     list.appendChild(div);
   });
+}
+
+/* =====================
+   BUTTON STATE MANAGEMENT
+===================== */
+function setButtonStateEdit(){
+  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Update Question';
+  document.getElementById("cancelBtn").style.display = 'inline-block';
+}
+
+function setButtonStateNormal(){
+  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Save Question';
+  document.getElementById("cancelBtn").style.display = 'none';
 }
 
 /* =====================
@@ -344,6 +387,12 @@ function editQuestion(i){
     `input[name='correct'][value='${q.correctIndex}']`
   ).checked = true;
   editIndex = i;
+  
+  // Update button state
+  setButtonStateEdit();
+  
+  // Scroll to form
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function deleteQuestion(i){
@@ -351,6 +400,11 @@ function deleteQuestion(i){
     questions.splice(i,1);
     renderQuestions();
   }
+}
+
+function cancelEdit(){
+  editIndex = null;
+  clearForm();
 }
 
 /* =====================
@@ -361,6 +415,7 @@ function clearForm(){
   [opt0,opt1,opt2,opt3].forEach(o=>o.value="");
   document.querySelectorAll("input[name='correct']")
     .forEach(r=>r.checked=false);
+  setButtonStateNormal();
 }
 
 /* =====================
@@ -388,6 +443,12 @@ async function createTest(){
     questions
   };
 
+  // Show loading state
+  const createBtn = event.target;
+  const originalText = createBtn.innerHTML;
+  createBtn.disabled = true;
+  createBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
+
   try{
     const res = await fetch(`${API_BASE}/api/quiz/create`,{
       method:"POST",
@@ -402,6 +463,8 @@ async function createTest(){
 
     if(!res.ok){
       alert(data.msg || "Failed to create test");
+      createBtn.disabled = false;
+      createBtn.innerHTML = originalText;
       return;
     }
 
@@ -411,6 +474,8 @@ async function createTest(){
   }catch(err){
     alert("Server error. Try again.");
     console.error(err);
+    createBtn.disabled = false;
+    createBtn.innerHTML = originalText;
   }
 }
 </script>

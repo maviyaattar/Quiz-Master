@@ -69,6 +69,13 @@
       border:1px solid #e5e7eb;
       margin-bottom:14px;
       font-size:14px;
+      transition:border-color 0.3s ease;
+    }
+
+    .input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(91, 108, 255, 0.1);
     }
 
     .btn{
@@ -82,6 +89,22 @@
       cursor:pointer;
       font-size:15px;
       margin-top:6px;
+      transition:all 0.3s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(91, 108, 255, 0.4);
+    }
+
+    .btn:active{
+      transform:translateY(0);
+    }
+
+    .btn:disabled{
+      opacity:0.6;
+      cursor:not-allowed;
+      transform:none;
     }
 
     .msg{
@@ -122,6 +145,7 @@ async function joinQuiz(){
   const rollNo = document.getElementById("roll").value.trim();
   const branch = document.getElementById("branch").value.trim();
   const msg = document.getElementById("msg");
+  const btn = event.target;
 
   msg.innerText = "";
   msg.className = "msg";
@@ -131,6 +155,10 @@ async function joinQuiz(){
     msg.classList.add("error");
     return;
   }
+
+  // Show loading state
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Joining...';
 
   try{
     const res = await fetch(`${API}/api/quiz/join/${code}`,{
@@ -146,31 +174,30 @@ async function joinQuiz(){
     if(!res.ok){
       msg.innerText = data.msg || "Unable to join";
       msg.classList.add("error");
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-arrow-right"></i> Join Quiz';
       return;
     }
 
-    if(data.status === "created"){
-      msg.innerText = "⏳ Quiz not started yet";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "ended"){
-      msg.innerText = "❌ Quiz already ended";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "allowed"){
-      localStorage.setItem("joiner", JSON.stringify({
-        code, name, rollNo, branch
-      }));
+    // Store joiner data and redirect to attempt page
+    // The attempt page has a polling mechanism that checks quiz status every 3 seconds
+    // It will automatically show the wait screen if quiz is not started, or the quiz interface if started
+    localStorage.setItem("joiner", JSON.stringify({
+      code, name, rollNo, branch
+    }));
+    
+    msg.innerText = "✅ Redirecting to quiz...";
+    msg.classList.add("success");
+    
+    setTimeout(() => {
       location.href = "attempt.html?code=" + code;
-    }
+    }, 500);
 
   }catch(err){
     msg.innerText = "Server error. Try again.";
     msg.classList.add("error");
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa fa-arrow-right"></i> Join Quiz';
   }
 }
 </script>
