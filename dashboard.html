@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | QuizMaster</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Icons -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --primary:#5b6cff;
+      --secondary:#8f5bff;
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --radius:18px;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Poppins",sans-serif;
+    }
+
+    body{
+      background:linear-gradient(180deg,#f5f7fb,#eef0ff);
+      min-height:100vh;
+      color:var(--text);
+      padding-bottom:70px;
+    }
+
+    /* ===== TOP NAV ===== */
+    .top-nav{
+      position:sticky;
+      top:0;
+      z-index:100;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 24px;
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+
+    .brand{
+      font-size:20px;
+      font-weight:700;
+      color:var(--primary);
+    }
+
+    .nav-links{
+      display:flex;
+      gap:26px;
+    }
+
+    .nav-links a{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:600;
+    }
+
+    .nav-links a:hover{color:var(--primary)}
+
+    /* ===== CONTAINER ===== */
+    .container{
+      padding:26px;
+    }
+
+    /* ===== QUIZ GRID ===== */
+    .quiz-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:22px;
+    }
+
+    .quiz-card{
+      background:#fff;
+      padding:22px;
+      border-radius:var(--radius);
+      box-shadow:0 18px 35px rgba(0,0,0,.1);
+      cursor:pointer;
+      transition:.3s;
+    }
+
+    .quiz-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 28px 55px rgba(0,0,0,.15);
+    }
+
+    .quiz-card h3{
+      font-size:18px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .quiz-card p{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    /* ===== STATUS ===== */
+    .status{
+      display:inline-block;
+      margin-top:10px;
+      padding:5px 14px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      color:#fff;
+    }
+
+    .created{background:#fbbf24}
+    .live{background:#22c55e}
+    .ended{background:#ef4444}
+
+    /* ===== EMPTY ===== */
+    .empty{
+      background:#fff;
+      padding:40px;
+      text-align:center;
+      border-radius:var(--radius);
+      color:var(--muted);
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      background:#fff;
+      display:none;
+      justify-content:space-around;
+      padding:10px 0;
+      box-shadow:0 -6px 20px rgba(0,0,0,.08);
+      z-index:200;
+    }
+
+    .bottom-nav a{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+    }
+
+    .bottom-nav a.active{color:var(--primary)}
+
+    @media(max-width:768px){
+      .nav-links{display:none}
+      .bottom-nav{display:flex}
+      .container{padding:18px}
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ===== TOP NAV ===== -->
+<nav class="top-nav">
+  <div class="brand">QuizMaster</div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="create.html">Create Test</a>
+    <a href="profile.html">Profile</a>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<div class="container">
+  <h2 style="margin-bottom:20px">My Tests</h2>
+  <div class="quiz-grid" id="quizGrid">
+    <!-- REAL QUIZZES LOAD HERE -->
+  </div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="active">
+    <i class="fa fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="create.html">
+    <i class="fa fa-plus-circle"></i>
+    <span>Create</span>
+  </a>
+  <a href="profile.html">
+    <i class="fa fa-user"></i>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<script>
+/* =====================
+   CONFIG
+===================== */
+const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const token = localStorage.getItem("token");
+
+if(!token){
+  location.href = "Auth.html";
+}
+
+/* =====================
+   LOAD QUIZZES (REAL)
+===================== */
+async function loadQuizzes(){
+  try{
+    const res = await fetch(`${API}/api/quiz/my`,{
+      headers:{
+        "Authorization":"Bearer "+token
+      }
+    });
+
+    const quizzes = await res.json();
+    const grid = document.getElementById("quizGrid");
+    grid.innerHTML = "";
+
+    if(quizzes.length === 0){
+      grid.innerHTML = `
+        <div class="empty">
+          <h3>No tests yet</h3>
+          <p>Create your first quiz to get started 🚀</p>
+        </div>`;
+      return;
+    }
+
+    quizzes.forEach(q=>{
+      const div = document.createElement("div");
+      div.className = "quiz-card";
+      div.onclick = ()=>openTest(q.code);
+
+      div.innerHTML = `
+        <h3>${q.title}</h3>
+        <p>${q.description || "No description"}</p>
+        <span class="status ${q.status}">
+          ${q.status.toUpperCase()}
+        </span>
+      `;
+
+      grid.appendChild(div);
+    });
+
+  }catch(err){
+    alert("Failed to load quizzes");
+    console.error(err);
+  }
+}
+
+/* =====================
+   OPEN TEST
+===================== */
+function openTest(code){
+  location.href = "test.html?code=" + code;
+}
+
+/* INIT */
+loadQuizzes();
+</script>
+
+</body>
+</html>
