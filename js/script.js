@@ -171,11 +171,15 @@ async function registerUser(e){
 
 /* ==========================================
    INITIALIZE - CHECK IF ALREADY LOGGED IN
+   Note: Token validation happens on API calls.
+   If token is invalid, API will return 401 and
+   user will be redirected to login.
    ========================================== */
 (function init() {
   const token = localStorage.getItem("token");
+  // Basic check: if token exists and user is on auth page, redirect
+  // Actual token validity is verified by API on protected routes
   if (token && window.location.pathname.includes('auth.html')) {
-    // User is already logged in, redirect to dashboard
     location.href = "dashboard.html";
   }
 })();
