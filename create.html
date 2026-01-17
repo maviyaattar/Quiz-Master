@@ -364,6 +364,19 @@ function renderQuestions(){
 }
 
 /* =====================
+   BUTTON STATE MANAGEMENT
+===================== */
+function setButtonStateEdit(){
+  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Update Question';
+  document.getElementById("cancelBtn").style.display = 'inline-block';
+}
+
+function setButtonStateNormal(){
+  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Save Question';
+  document.getElementById("cancelBtn").style.display = 'none';
+}
+
+/* =====================
    EDIT / DELETE
 ===================== */
 function editQuestion(i){
@@ -375,9 +388,8 @@ function editQuestion(i){
   ).checked = true;
   editIndex = i;
   
-  // Update button text and show cancel button
-  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Update Question';
-  document.getElementById("cancelBtn").style.display = 'inline-block';
+  // Update button state
+  setButtonStateEdit();
   
   // Scroll to form
   window.scrollTo({top: 0, behavior: 'smooth'});
@@ -393,8 +405,6 @@ function deleteQuestion(i){
 function cancelEdit(){
   editIndex = null;
   clearForm();
-  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Save Question';
-  document.getElementById("cancelBtn").style.display = 'none';
 }
 
 /* =====================
@@ -405,8 +415,7 @@ function clearForm(){
   [opt0,opt1,opt2,opt3].forEach(o=>o.value="");
   document.querySelectorAll("input[name='correct']")
     .forEach(r=>r.checked=false);
-  document.getElementById("saveBtn").innerHTML = '<i class="fa fa-save"></i> Save Question';
-  document.getElementById("cancelBtn").style.display = 'none';
+  setButtonStateNormal();
 }
 
 /* =====================

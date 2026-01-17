@@ -192,6 +192,7 @@ if(!code||!joiner) location.href="join.html";
 
 let questions=[],answers=[],index=0,endTime=null,timerInt=null;
 let warnings=0;
+let visibilityHandlerBound=null;
 
 /* WAIT FOR START (AUTO) */
 const poll=setInterval(async()=>{
@@ -306,15 +307,18 @@ function warn(){
 }
 
 function setupAntiCheat(){
+  visibilityHandlerBound=visibilityHandler;
   window.onblur=warn;
-  document.addEventListener("visibilitychange",visibilityHandler);
+  document.addEventListener("visibilitychange",visibilityHandlerBound);
   document.oncontextmenu=e=>e.preventDefault();
   document.oncopy=e=>e.preventDefault();
 }
 
 function removeAntiCheat(){
   window.onblur=null;
-  document.removeEventListener("visibilitychange",visibilityHandler);
+  if(visibilityHandlerBound){
+    document.removeEventListener("visibilitychange",visibilityHandlerBound);
+  }
   document.oncontextmenu=null;
   document.oncopy=null;
 }

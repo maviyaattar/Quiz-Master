@@ -180,7 +180,8 @@ async function joinQuiz(){
     }
 
     // Store joiner data and redirect to attempt page
-    // The attempt page will handle the wait screen automatically
+    // The attempt page has a polling mechanism that checks quiz status every 3 seconds
+    // It will automatically show the wait screen if quiz is not started, or the quiz interface if started
     localStorage.setItem("joiner", JSON.stringify({
       code, name, rollNo, branch
     }));
