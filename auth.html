@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Authentication</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-box card">
+
+    <div class="auth-tabs">
+      <button id="loginTab" class="active" onclick="switchAuth('login')">Login</button>
+      <button id="registerTab" onclick="switchAuth('register')">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <form id="loginForm" onsubmit="login(event)">
+      <div class="input-group">
+        <i class="fa fa-envelope"></i>
+        <input id="email" class="input" placeholder="Email">
+      </div>
+      <div class="input-group">
+        <i class="fa fa-lock"></i>
+        <input id="password" type="password" class="input" placeholder="Password">
+      </div>
+      <button class="btn btn-primary">Login</button>
+    </form>
+
+    <!-- REGISTER -->
+    <form id="registerForm" style="display:none" onsubmit="registerUser(event)">
+      <div class="input-group">
+        <i class="fa fa-user"></i>
+        <input id="rname" class="input" placeholder="Full name">
+      </div>
+      <div class="input-group">
+        <i class="fa fa-envelope"></i>
+        <input id="remail" class="input" placeholder="Email">
+      </div>
+      <div class="input-group">
+        <i class="fa fa-lock"></i>
+        <input id="rpassword" type="password" class="input" placeholder="Password">
+      </div>
+      <button class="btn btn-primary">Create Account</button>
+    </form>
+
+    <p class="msg" id="msg"></p>
+  </div>
+</div>
+
+<div class="footer">
+  Made with ❤️ by <strong>Maviya Attar</strong>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
