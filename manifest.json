@@ -1,6 +1,6 @@
 {
-  "name": "Maviya Attar QuizMaster",
-  "short_name": "QuizMaster",
+  "name": "Online Quiz Platform",
+  "short_name": "Quiz Platform",
   "description": "Create, manage, and take professional online quizzes",
   "start_url": "/",
   "display": "standalone",
