@@ -534,8 +534,8 @@ function setupAntiCheat() {
   
   // Prevent page refresh/navigation during quiz
   window.onbeforeunload = (e) => {
-    e.preventDefault();
     warn();
+    // Return string to trigger browser's native confirmation dialog
     return "Are you sure you want to leave? Your quiz progress may be lost.";
   };
   
