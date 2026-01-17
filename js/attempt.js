@@ -12,6 +12,16 @@ if (!code || !joiner) {
   location.href = "join.html";
 }
 
+// Populate wait screen with user info (with null checks)
+const waitName = document.getElementById('waitName');
+const waitCode = document.getElementById('waitCode');
+if (waitName && joiner) {
+  waitName.textContent = joiner.name;
+}
+if (waitCode && code) {
+  waitCode.textContent = code;
+}
+
 // State variables
 let questions = [];
 let answers = [];
@@ -26,22 +36,35 @@ let warnings = 0;
 const poll = setInterval(async () => {
   try {
     const r = await fetch(`${API}/api/quiz/questions/${code}`);
-    if (!r.ok) return;
+    
+    // If quiz hasn't started yet, keep showing wait screen
+    if (!r.ok) {
+      // Keep waiting, don't show any error
+      return;
+    }
     
     const d = await r.json();
-    clearInterval(poll);
+    
+    // Check if we have questions (quiz has started)
+    if (d.questions && d.questions.length > 0) {
+      clearInterval(poll);
 
-    questions = d.questions;
-    endTime = new Date(d.endTime);
+      questions = d.questions;
+      endTime = new Date(d.endTime);
 
-    // Show quiz screen
-    document.getElementById('waitScreen').classList.add("hide");
-    document.getElementById('quizScreen').classList.remove("hide");
+      // Show quiz screen
+      document.getElementById('waitScreen').classList.add("hide");
+      document.getElementById('quizScreen').classList.remove("hide");
 
-    render();
-    startTimer();
+      // Setup anti-cheat mechanisms when quiz starts
+      setupAntiCheat();
+
+      render();
+      startTimer();
+    }
   } catch (err) {
-    console.error('Polling error:', err);
+    // Keep waiting silently, don't show error to user
+    console.log('Waiting for quiz to start...');
   }
 }, 3000);
 
@@ -71,9 +94,14 @@ function render() {
   const progressEl = document.getElementById('progress');
   const questionEl = document.getElementById('question');
   const optionsEl = document.getElementById('options');
+  const progressBar = document.getElementById('progressBar');
 
   // Update progress
   progressEl.innerText = `Question ${index + 1} of ${questions.length}`;
+  
+  // Update progress bar
+  const progressPercent = ((index + 1) / questions.length) * 100;
+  progressBar.style.width = progressPercent + '%';
   
   // Sanitize and update question text
   questionEl.innerText = sanitizeText(q.text);
@@ -91,6 +119,26 @@ function render() {
     };
     optionsEl.appendChild(d);
   });
+
+  // Update navigation buttons
+  updateNavigationButtons();
+}
+
+/* ==========================================
+   UPDATE NAVIGATION BUTTONS
+   ========================================== */
+function updateNavigationButtons() {
+  const navBtns = document.querySelector('.nav-btns');
+  const isLastQuestion = index === questions.length - 1;
+
+  navBtns.innerHTML = `
+    <button class="btn outline" onclick="prevQuestion()" ${index === 0 ? 'disabled' : ''}>
+      <i class="fa fa-arrow-left"></i> Previous
+    </button>
+    <button class="btn" onclick="${isLastQuestion ? 'confirmSubmit()' : 'nextQuestion()'}">
+      ${isLastQuestion ? '<i class="fa fa-check"></i> Submit Quiz' : 'Next <i class="fa fa-arrow-right"></i>'}
+    </button>
+  `;
 }
 
 /* ==========================================
@@ -100,8 +148,6 @@ function nextQuestion() {
   if (index < questions.length - 1) {
     index++;
     render();
-  } else {
-    submit();
   }
 }
 
@@ -113,10 +159,30 @@ function prevQuestion() {
 }
 
 /* ==========================================
+   CONFIRM SUBMISSION
+   ========================================== */
+function confirmSubmit() {
+  // Count unanswered questions
+  const unanswered = questions.length - answers.filter(a => a !== undefined).length;
+  
+  let message = "Are you sure you want to submit your quiz?";
+  if (unanswered > 0) {
+    message += `\n\nYou have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}.`;
+  }
+  
+  if (confirm(message)) {
+    submit();
+  }
+}
+
+/* ==========================================
    SUBMIT QUIZ
    ========================================== */
 async function submit() {
   clearInterval(timerInt);
+  
+  // Remove anti-cheat mechanisms after submission
+  removeAntiCheat();
 
   try {
     await fetch(`${API}/api/quiz/submit/${code}`, {
@@ -136,6 +202,19 @@ async function submit() {
 }
 
 /* ==========================================
+   REMOVE ANTI-CHEAT MECHANISMS
+   ========================================== */
+function removeAntiCheat() {
+  // Remove all anti-cheat event listeners
+  window.onblur = null;
+  document.oncontextmenu = null;
+  document.oncopy = null;
+  
+  // Remove visibility change listener
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+}
+
+/* ==========================================
    ANTI-CHEAT - WARNING SYSTEM
    ========================================== */
 function warn() {
@@ -148,19 +227,25 @@ function warn() {
   }
 }
 
-// Detect window blur (user switches tabs/apps)
-window.onblur = warn;
-
-// Detect visibility change (tab hidden)
-document.addEventListener("visibilitychange", () => {
+// Visibility change handler (needs to be a named function for removal)
+function handleVisibilityChange() {
   if (document.hidden) warn();
-});
+}
 
-// Prevent right-click context menu
-document.oncontextmenu = (e) => e.preventDefault();
-
-// Prevent text copying
-document.oncopy = (e) => e.preventDefault();
+// Setup anti-cheat on quiz start
+function setupAntiCheat() {
+  // Detect window blur (user switches tabs/apps)
+  window.onblur = warn;
+  
+  // Detect visibility change (tab hidden)
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  
+  // Prevent right-click context menu
+  document.oncontextmenu = (e) => e.preventDefault();
+  
+  // Prevent text copying
+  document.oncopy = (e) => e.preventDefault();
+}
 
 /* ==========================================
    SECURITY - SANITIZE TEXT

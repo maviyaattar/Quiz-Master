@@ -28,15 +28,31 @@
 <body>
   <!-- WAIT SCREEN -->
   <div class="card center" id="waitScreen">
-    <div class="loading"></div>
-    <h2>⏳ Waiting for host to start quiz</h2>
-    <p>Please stay on this page</p>
+    <div class="loading-spinner"></div>
+    <h2 class="wait-title">⏳ Waiting for Quiz to Start</h2>
+    <p class="wait-subtitle">Your host will start the quiz shortly</p>
+    <div class="wait-info">
+      <div class="info-item">
+        <i class="fa fa-user"></i>
+        <span id="waitName"></span>
+      </div>
+      <div class="info-item">
+        <i class="fa fa-code"></i>
+        <span id="waitCode"></span>
+      </div>
+    </div>
+    <p class="wait-message">Please stay on this page and do not refresh</p>
   </div>
 
   <!-- QUIZ SCREEN -->
   <div class="card hide" id="quizScreen">
-    <div class="timer" id="timer">⏱ --:--</div>
-    <div class="progress" id="progress">Question 0 of 0</div>
+    <div class="quiz-header">
+      <div class="timer" id="timer">⏱ --:--</div>
+      <div class="progress-text" id="progress">Question 0 of 0</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
     <hr><br>
 
     <div class="question" id="question">Loading question...</div>
