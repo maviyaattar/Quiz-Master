@@ -186,15 +186,18 @@ function editQuestion(index) {
  * @param {number} index - Index of question to delete
  */
 function deleteQuestion(index) {
-  if (confirm("Are you sure you want to delete this question?")) {
-    questions.splice(index, 1);
-    if (editIndex === index) {
-      editIndex = null;
-      clearForm();
+  showConfirmDialog(
+    "Are you sure you want to delete this question?",
+    () => {
+      questions.splice(index, 1);
+      if (editIndex === index) {
+        editIndex = null;
+        clearForm();
+      }
+      renderQuestions();
+      showAlert("success", "Question deleted!");
     }
-    renderQuestions();
-    showAlert("success", "Question deleted!");
-  }
+  );
 }
 
 /* ===== FORM MANAGEMENT ===== */
@@ -332,6 +335,8 @@ function showAlert(type, message) {
   const colors = {
     success: { bg: "#d1fae5", text: "#065f46", border: "#6ee7b7" },
     error: { bg: "#fee2e2", text: "#7f1d1d", border: "#fca5a5" },
+    warning: { bg: "#fef3c7", text: "#92400e", border: "#fbbf24" },
+    danger: { bg: "#fee2e2", text: "#7f1d1d", border: "#ef4444" },
     info: { bg: "#dbeafe", text: "#0c2340", border: "#93c5fd" },
   };
 
@@ -343,7 +348,7 @@ function showAlert(type, message) {
   alert.innerHTML = `
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 18px;">
-        ${type === "success" ? "✓" : type === "error" ? "✕" : "ℹ"}
+        ${type === "success" ? "✓" : type === "error" || type === "danger" ? "✕" : type === "warning" ? "⚠" : "ℹ"}
       </span>
       <span>${escapeHtml(message)}</span>
     </div>
@@ -404,5 +409,126 @@ style.textContent = `
       opacity: 0;
     }
   }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 `;
+document.head.appendChild(style);
+
+/* ===== SHOW CONFIRM DIALOG ===== */
+/**
+ * Show styled confirmation dialog
+ * @param {string} message - Message to display
+ * @param {function} onConfirm - Callback on confirmation
+ */
+function showConfirmDialog(message, onConfirm) {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'confirmOverlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  `;
+  
+  const dialog = document.createElement('div');
+  dialog.style.cssText = `
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: scaleIn 0.3s ease-out;
+  `;
+  
+  dialog.innerHTML = `
+    <div style="text-align: center;">
+      <i class="fa fa-question-circle" style="font-size: 48px; color: var(--primary); margin-bottom: 16px;"></i>
+      <h3 style="margin-bottom: 12px; color: var(--text);">Confirm Action</h3>
+      <p style="color: var(--muted); margin-bottom: 24px;">${escapeHtml(message)}</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button id="confirmNo" style="
+          padding: 12px 24px;
+          border: 2px solid var(--primary);
+          background: white;
+          color: var(--primary);
+          border-radius: 30px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">Cancel</button>
+        <button id="confirmYes" style="
+          padding: 12px 24px;
+          border: none;
+          background: var(--primary);
+          color: white;
+          border-radius: 30px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">Confirm</button>
+      </div>
+    </div>
+  `;
+  
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  
+  // Event listeners
+  document.getElementById('confirmNo').onclick = () => {
+    overlay.style.animation = 'fadeOut 0.3s ease-out';
+    setTimeout(() => overlay.remove(), 300);
+  };
+  
+  document.getElementById('confirmYes').onclick = () => {
+    overlay.style.animation = 'fadeOut 0.3s ease-out';
+    setTimeout(() => {
+      overlay.remove();
+      onConfirm();
+    }, 300);
+  };
+  
+  // Close on overlay click
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(() => overlay.remove(), 300);
+    }
+  };
+}
 document.head.appendChild(style);
