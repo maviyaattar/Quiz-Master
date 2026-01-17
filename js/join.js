@@ -77,18 +77,14 @@ async function verifyCode() {
     }
 
     // Check quiz status
-    if (data.status === "created") {
-      showMessage("⏳ Quiz not started yet. Please try later.", "warning");
-      return;
-    }
-
     if (data.status === "ended") {
       showMessage("❌ This quiz has already ended", "error");
       return;
     }
 
-    if (data.status === "allowed") {
-      // Code is valid and quiz is active
+    // For both "created" and "allowed" status, proceed to step 2
+    if (data.status === "created" || data.status === "allowed") {
+      // Code is valid
       verifiedCode = code;
       showMessage("✓ Quiz code verified!", "success");
       
@@ -293,13 +289,6 @@ async function joinQuiz() {
     }
 
     // ===== STATUS CHECKING =====
-    if (data.status === "created") {
-      showMessage("⏳ Quiz has not started yet. Please try later.", "warning");
-      btn.disabled = false;
-      btn.classList.remove("loading");
-      return;
-    }
-
     if (data.status === "ended") {
       showMessage("❌ This quiz has already ended", "error");
       btn.disabled = false;
@@ -307,7 +296,9 @@ async function joinQuiz() {
       return;
     }
 
-    if (data.status === "allowed") {
+    // For both "created" and "allowed" status, proceed to attempt page
+    // The waiting screen in attempt.html will handle the "not started" state
+    if (data.status === "created" || data.status === "allowed") {
       showMessage("✓ Joining quiz...", "success");
 
       // Store joiner data in localStorage
