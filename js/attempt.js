@@ -15,7 +15,7 @@ if (!code || !joiner) {
 // Populate wait screen with user info (with null checks)
 const waitName = document.getElementById('waitName');
 const waitCode = document.getElementById('waitCode');
-if (waitName && joiner) {
+if (waitName && joiner && joiner.name) {
   waitName.textContent = joiner.name;
 }
 if (waitCode && code) {
@@ -99,9 +99,11 @@ function render() {
   // Update progress
   progressEl.innerText = `Question ${index + 1} of ${questions.length}`;
   
-  // Update progress bar
-  const progressPercent = ((index + 1) / questions.length) * 100;
-  progressBar.style.width = progressPercent + '%';
+  // Update progress bar (with null check)
+  if (progressBar) {
+    const progressPercent = ((index + 1) / questions.length) * 100;
+    progressBar.style.width = progressPercent + '%';
+  }
   
   // Sanitize and update question text
   questionEl.innerText = sanitizeText(q.text);
