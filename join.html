@@ -149,24 +149,12 @@ async function joinQuiz(){
       return;
     }
 
-    if(data.status === "created"){
-      msg.innerText = "⏳ Quiz not started yet";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "ended"){
-      msg.innerText = "❌ Quiz already ended";
-      msg.classList.add("error");
-      return;
-    }
-
-    if(data.status === "allowed"){
-      localStorage.setItem("joiner", JSON.stringify({
-        code, name, rollNo, branch
-      }));
-      location.href = "attempt.html?code=" + code;
-    }
+    // Store joiner data and redirect to attempt page
+    // The attempt page will handle the wait screen automatically
+    localStorage.setItem("joiner", JSON.stringify({
+      code, name, rollNo, branch
+    }));
+    location.href = "attempt.html?code=" + code;
 
   }catch(err){
     msg.innerText = "Server error. Try again.";
