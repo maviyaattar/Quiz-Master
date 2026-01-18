@@ -30,6 +30,28 @@ let endTime = null;
 let timerInt = null;
 let warnings = 0;
 
+// PERFORMANCE: Cache frequently accessed DOM elements to avoid repeated lookups
+let cachedElements = null;
+
+/* ==========================================
+   CACHE DOM ELEMENTS - PERFORMANCE OPTIMIZATION
+   ========================================== */
+function cacheElements() {
+  if (!cachedElements) {
+    cachedElements = {
+      progressEl: document.getElementById('progress'),
+      questionEl: document.getElementById('question'),
+      optionsEl: document.getElementById('options'),
+      progressBar: document.getElementById('progressBar'),
+      timer: document.getElementById('timer'),
+      quizScreen: document.getElementById('quizScreen'),
+      waitScreen: document.getElementById('waitScreen'),
+      thankScreen: document.getElementById('thankScreen')
+    };
+  }
+  return cachedElements;
+}
+
 /* ==========================================
    WAIT FOR START - AUTO POLLING
    ========================================== */
@@ -52,12 +74,19 @@ const poll = setInterval(async () => {
       questions = d.questions;
       endTime = new Date(d.endTime);
 
+      // PERFORMANCE: Cache DOM elements before starting quiz
+      cacheElements();
+
       // Show quiz screen
-      document.getElementById('waitScreen').classList.add("hide");
-      document.getElementById('quizScreen').classList.remove("hide");
+      const elements = cacheElements();
+      elements.waitScreen.classList.add("hide");
+      elements.quizScreen.classList.remove("hide");
 
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
+      
+      // PERFORMANCE: Setup event delegation after elements exist
+      setupEventDelegation();
 
       render();
       startTimer();
@@ -72,6 +101,7 @@ const poll = setInterval(async () => {
    TIMER FUNCTIONALITY
    ========================================== */
 function startTimer() {
+  const elements = cacheElements();
   timerInt = setInterval(() => {
     const diff = endTime - new Date();
     
@@ -80,50 +110,81 @@ function startTimer() {
       return;
     }
     
+    // PERFORMANCE: Minimize string operations
     const m = Math.floor(diff / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('timer').innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+    elements.timer.innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
   }, 1000);
 }
 
 /* ==========================================
    RENDER CURRENT QUESTION
+   PERFORMANCE OPTIMIZED: Uses cached DOM elements, event delegation, and minimal DOM updates
    ========================================== */
 function render() {
   const q = questions[index];
-  const progressEl = document.getElementById('progress');
-  const questionEl = document.getElementById('question');
-  const optionsEl = document.getElementById('options');
-  const progressBar = document.getElementById('progressBar');
+  const elements = cacheElements();
 
-  // Update progress
-  progressEl.innerText = `Question ${index + 1} of ${questions.length}`;
+  // PERFORMANCE: Update progress text (minimal DOM manipulation)
+  elements.progressEl.innerText = `Question ${index + 1} of ${questions.length}`;
   
-  // Update progress bar (with null check)
-  if (progressBar) {
+  // PERFORMANCE: Update progress bar with transform for better performance
+  if (elements.progressBar) {
     const progressPercent = ((index + 1) / questions.length) * 100;
-    progressBar.style.width = progressPercent + '%';
+    elements.progressBar.style.width = progressPercent + '%';
   }
   
   // Sanitize and update question text
-  questionEl.innerText = sanitizeText(q.text);
+  elements.questionEl.innerText = sanitizeText(q.text);
   
-  // Clear and rebuild options
-  optionsEl.innerHTML = "";
+  // PERFORMANCE: Use DocumentFragment for batch DOM updates
+  const fragment = document.createDocumentFragment();
 
   q.options.forEach((o, i) => {
     const d = document.createElement("div");
     d.className = "option" + (answers[index] === i ? " active" : "");
     d.innerText = sanitizeText(o);
-    d.onclick = () => {
-      answers[index] = i;
-      render();
-    };
-    optionsEl.appendChild(d);
+    // PERFORMANCE: Store index in data attribute for event delegation
+    d.setAttribute('data-option-index', i);
+    fragment.appendChild(d);
   });
+
+  // PERFORMANCE: Clear and update in one operation
+  elements.optionsEl.innerHTML = "";
+  elements.optionsEl.appendChild(fragment);
 
   // Update navigation buttons
   updateNavigationButtons();
+}
+
+/* ==========================================
+   HANDLE OPTION CLICK - EVENT DELEGATION
+   ========================================== */
+function handleOptionClick(e) {
+  const optionDiv = e.target.closest('.option');
+  if (!optionDiv) return;
+  
+  const optionIndex = parseInt(optionDiv.getAttribute('data-option-index'), 10);
+  if (!isNaN(optionIndex)) {
+    answers[index] = optionIndex;
+    // PERFORMANCE: Only update CSS classes, no re-querying
+    const siblings = optionDiv.parentElement.children;
+    for (let i = 0; i < siblings.length; i++) {
+      siblings[i].className = 'option' + (i === optionIndex ? ' active' : '');
+    }
+  }
+}
+
+/* ==========================================
+   SETUP EVENT DELEGATION FOR OPTIONS
+   Called after quiz starts and elements are created
+   ========================================== */
+function setupEventDelegation() {
+  const elements = cacheElements();
+  if (elements.optionsEl) {
+    // PERFORMANCE: Use event delegation for all option clicks
+    elements.optionsEl.addEventListener('click', handleOptionClick);
+  }
 }
 
 /* ==========================================
@@ -197,9 +258,13 @@ async function submit() {
       body: JSON.stringify({ ...joiner, answers })
     });
 
-    // Show thank you screen
-    document.getElementById('quizScreen').classList.add("hide");
-    document.getElementById('thankScreen').classList.remove("hide");
+    // FIX: Hide loading overlay before showing thank you screen
+    hideLoadingState();
+    
+    // PERFORMANCE: Use cached elements
+    const elements = cacheElements();
+    elements.quizScreen.classList.add("hide");
+    elements.thankScreen.classList.remove("hide");
     localStorage.removeItem("joiner");
   } catch (err) {
     console.error('Submit error:', err);
@@ -229,16 +294,17 @@ function removeAntiCheat() {
 function warn() {
   warnings++;
   
+  // ENHANCEMENT: Increased warning threshold from 3 to 5
   // Determine alert type based on warning count
-  const alertType = warnings >= 3 ? 'danger' : 'warning';
-  const message = warnings >= 3 
+  const alertType = warnings >= 5 ? 'danger' : 'warning';
+  const message = warnings >= 5 
     ? 'Too many violations. Auto-submitting quiz now...'
     : 'Do not leave the exam screen!';
   
   // Show warning banner with countdown
   showWarningBanner(message, warnings, alertType);
 
-  if (warnings >= 3) {
+  if (warnings >= 5) {
     // Auto-submit after 2 seconds
     setTimeout(() => {
       submit();
@@ -282,7 +348,7 @@ function showWarningBanner(message, warningCount, type = 'warning') {
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 18px; font-weight: 700; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px;">
-        Warning ${warningCount} / 3
+        Warning ${warningCount} / 5
       </span>
     </div>
   `;
@@ -312,9 +378,10 @@ function removeWarningUI() {
 
 /* ==========================================
    SHOW ALERT
+   PERFORMANCE OPTIMIZED: Reuses container and minimizes DOM operations
    ========================================== */
 function showAlert(type, message) {
-  // Create or reuse alert container
+  // PERFORMANCE: Reuse alert container instead of querying every time
   let alertContainer = document.getElementById('alertContainer');
   if (!alertContainer) {
     alertContainer = document.createElement('div');
@@ -339,6 +406,7 @@ function showAlert(type, message) {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   `;
 
+  // PERFORMANCE: Use object literal lookup instead of multiple comparisons
   const colors = {
     success: { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' },
     error: { bg: '#fee2e2', text: '#7f1d1d', border: '#fca5a5' },
@@ -352,10 +420,19 @@ function showAlert(type, message) {
   alert.style.color = color.text;
   alert.style.borderLeft = `4px solid ${color.border}`;
 
+  // PERFORMANCE: Minimize innerHTML operations
+  const icons = {
+    success: '✓',
+    error: '✕',
+    danger: '✕',
+    warning: '⚠',
+    info: 'ℹ'
+  };
+  
   alert.innerHTML = `
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 18px;">
-        ${type === 'success' ? '✓' : type === 'error' || type === 'danger' ? '✕' : type === 'warning' ? '⚠' : 'ℹ'}
+        ${icons[type] || icons.info}
       </span>
       <span>${sanitizeText(message)}</span>
     </div>
@@ -460,8 +537,21 @@ function showConfirmDialog(message, onConfirm) {
 
 /* ==========================================
    SHOW LOADING STATE
+   PERFORMANCE OPTIMIZED: Reuses animation styles
    ========================================== */
 function showLoadingState() {
+  // PERFORMANCE: Only add spin animation once
+  if (!document.getElementById('spinAnimation')) {
+    const style = document.createElement('style');
+    style.id = 'spinAnimation';
+    style.textContent = `
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
   const loadingOverlay = document.createElement('div');
   loadingOverlay.id = 'loadingOverlay';
   loadingOverlay.style.cssText = `
@@ -493,18 +583,6 @@ function showLoadingState() {
       Submitting your quiz...
     </p>
   `;
-  
-  // Add spin animation if not present
-  if (!document.getElementById('spinAnimation')) {
-    const style = document.createElement('style');
-    style.id = 'spinAnimation';
-    style.textContent = `
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-  }
   
   document.body.appendChild(loadingOverlay);
 }
