@@ -84,6 +84,9 @@ const poll = setInterval(async () => {
 
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
+      
+      // PERFORMANCE: Setup event delegation after elements exist
+      setupEventDelegation();
 
       render();
       startTimer();
@@ -164,22 +167,25 @@ function handleOptionClick(e) {
   const optionIndex = parseInt(optionDiv.getAttribute('data-option-index'), 10);
   if (!isNaN(optionIndex)) {
     answers[index] = optionIndex;
-    // PERFORMANCE: Only update the affected elements instead of full re-render
-    const elements = cacheElements();
-    const allOptions = elements.optionsEl.querySelectorAll('.option');
-    allOptions.forEach((opt, i) => {
-      opt.className = 'option' + (i === optionIndex ? ' active' : '');
-    });
+    // PERFORMANCE: Only update CSS classes, no re-querying
+    const siblings = optionDiv.parentElement.children;
+    for (let i = 0; i < siblings.length; i++) {
+      siblings[i].className = 'option' + (i === optionIndex ? ' active' : '');
+    }
   }
 }
 
-// PERFORMANCE: Set up event delegation once on the options container
-document.addEventListener('DOMContentLoaded', () => {
+/* ==========================================
+   SETUP EVENT DELEGATION FOR OPTIONS
+   Called after quiz starts and elements are created
+   ========================================== */
+function setupEventDelegation() {
   const elements = cacheElements();
   if (elements.optionsEl) {
+    // PERFORMANCE: Use event delegation for all option clicks
     elements.optionsEl.addEventListener('click', handleOptionClick);
   }
-});
+}
 
 /* ==========================================
    UPDATE NAVIGATION BUTTONS
