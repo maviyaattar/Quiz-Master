@@ -286,6 +286,8 @@ async function submit() {
     
     // Restart timer if there's still time left
     if (endTime && endTime - new Date() > 0) {
+      // Re-enable anti-cheat mechanisms since quiz is still active
+      setupAntiCheat();
       startTimer();
     }
   }
