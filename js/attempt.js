@@ -283,6 +283,11 @@ async function submit() {
     showAlert('error', 'Failed to submit quiz. Please try again.');
     // Re-enable the quiz screen
     hideLoadingState();
+    
+    // Restart timer if there's still time left
+    if (endTime && endTime - new Date() > 0) {
+      startTimer();
+    }
   }
 }
 
