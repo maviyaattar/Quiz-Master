@@ -252,11 +252,23 @@ async function submit() {
     // Show loading state
     showLoadingState();
     
-    await fetch(`${API}/api/quiz/submit/${code}`, {
+    // Submit quiz answers to the API and validate response
+    const response = await fetch(`${API}/api/quiz/submit/${code}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...joiner, answers })
     });
+
+    // Validate that the submission was successful
+    if (!response.ok) {
+      throw new Error(`Submission failed with status: ${response.status}`);
+    }
+
+    // Parse the response to confirm submission
+    const result = await response.json();
+    
+    // Log successful submission for debugging
+    console.log('Quiz submitted successfully:', result);
 
     // FIX: Hide loading overlay before showing thank you screen
     hideLoadingState();
