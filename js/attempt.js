@@ -72,7 +72,9 @@ const poll = setInterval(async () => {
       clearInterval(poll);
 
       questions = d.questions;
-      endTime = new Date(d.endTime);
+      // Subtract 20 seconds from backend endTime to create buffer
+      // Display shows 20 seconds less than actual time
+      endTime = new Date(new Date(d.endTime).getTime() - 20000);
 
       // PERFORMANCE: Cache DOM elements before starting quiz
       cacheElements();
@@ -105,15 +107,26 @@ function startTimer() {
   timerInt = setInterval(() => {
     const diff = endTime - new Date();
     
+    // Submit when timer reaches 0 (which is actually 20 seconds before backend end)
     if (diff <= 0) {
-      submit();
+      submit(true); // Pass true to indicate timer-triggered submission
       return;
     }
     
-    // PERFORMANCE: Minimize string operations
+    // Calculate minutes and seconds for display
     const m = Math.floor(diff / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    elements.timer.innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+    
+    // Show countdown message when 10 seconds or less remain
+    if (diff <= 10000) {
+      const countdown = Math.ceil(diff / 1000);
+      elements.timer.innerText = `⏱ Submitting in ${countdown}...`;
+      elements.timer.classList.add('countdown-active'); // Add special class for countdown styling
+    } else {
+      // Normal timer display
+      elements.timer.innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+      elements.timer.classList.remove('countdown-active'); // Remove countdown class
+    }
   }, 1000);
 }
 
@@ -241,7 +254,7 @@ function confirmSubmit() {
 /* ==========================================
    SUBMIT QUIZ
    ========================================== */
-async function submit() {
+async function submit(isTimerTriggered = false) {
   clearInterval(timerInt);
   
   // Remove anti-cheat mechanisms and warning UI
@@ -252,25 +265,83 @@ async function submit() {
     // Show loading state
     showLoadingState();
     
-    await fetch(`${API}/api/quiz/submit/${code}`, {
+    // Submit quiz answers to the API
+    const response = await fetch(`${API}/api/quiz/submit/${code}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...joiner, answers })
     });
 
-    // FIX: Hide loading overlay before showing thank you screen
+    // Parse response (try to get error message if submission failed)
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (parseErr) {
+      // Response is not JSON, but that's okay for successful submissions
+      console.log('Submission completed, status:', response.status);
+    }
+
+    // Hide loading overlay
     hideLoadingState();
+
+    // If timer triggered submission, always show thank you screen
+    // Backend has received the attempt regardless of response status
+    if (isTimerTriggered) {
+      console.log('Timer expired - quiz attempt recorded');
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+      return;
+    }
+
+    // For manual submissions, check if submission was successful
+    if (!response.ok) {
+      // Show error message from backend or generic message
+      const errorMsg = result?.msg || 'Submission failed. Please try again.';
+      showAlert('error', errorMsg);
+      
+      // Restart timer if there's still time left
+      if (endTime && endTime - new Date() > 0) {
+        setupAntiCheat();
+        startTimer();
+      }
+      return;
+    }
+
+    // Submission successful - show thank you screen
+    console.log('Quiz submitted successfully:', result);
     
-    // PERFORMANCE: Use cached elements
+    // Use cached elements
     const elements = cacheElements();
     elements.quizScreen.classList.add("hide");
     elements.thankScreen.classList.remove("hide");
     localStorage.removeItem("joiner");
   } catch (err) {
     console.error('Submit error:', err);
+    
+    // If timer triggered, still show thank you screen
+    // The attempt was made even if network failed
+    if (isTimerTriggered) {
+      console.log('Timer expired - showing completion screen despite error');
+      hideLoadingState();
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+      return;
+    }
+    
     showAlert('error', 'Failed to submit quiz. Please try again.');
     // Re-enable the quiz screen
     hideLoadingState();
+    
+    // Restart timer if there's still time left
+    if (endTime && endTime - new Date() > 0) {
+      // Re-enable anti-cheat mechanisms since quiz is still active
+      setupAntiCheat();
+      startTimer();
+    }
   }
 }
 

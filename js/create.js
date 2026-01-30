@@ -266,7 +266,7 @@ async function createTest() {
     const payload = {
       title,
       description,
-      duration: durationMin * 60, // Convert minutes to seconds
+      duration: durationMin * 60 + 20, // Convert minutes to seconds and add 20 second buffer
       questions,
     };
 
