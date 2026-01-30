@@ -58,6 +58,35 @@ body {
   font-weight: 700;
   color: var(--primary);
   animation: pulse 2s infinite;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: rgba(91, 108, 255, 0.1);
+}
+
+/* Enhanced countdown styling */
+.timer.countdown-active {
+  font-size: 22px;
+  color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+  animation: countdownPulse 1s infinite;
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  font-weight: 800;
+}
+
+/* Countdown pulse animation - more dramatic than normal pulse */
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+  }
 }
 
 @keyframes pulse {
