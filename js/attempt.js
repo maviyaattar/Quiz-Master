@@ -259,18 +259,34 @@ async function submit() {
       body: JSON.stringify({ ...joiner, answers })
     });
 
-    // Try to parse response, but don't fail if it's not JSON
+    // Parse response (try to get error message if submission failed)
     let result = null;
     try {
       result = await response.json();
-      console.log('Quiz submitted successfully:', result);
     } catch (parseErr) {
-      // Response might not be JSON, but submission may have succeeded
-      console.log('Submission completed, response:', response.status);
+      // Response is not JSON, but that's okay for successful submissions
+      console.log('Submission completed, status:', response.status);
     }
 
-    // Hide loading overlay before showing thank you screen
+    // Hide loading overlay
     hideLoadingState();
+
+    // Check if submission was successful
+    if (!response.ok) {
+      // Show error message from backend or generic message
+      const errorMsg = result?.msg || 'Submission failed. Please try again.';
+      showAlert('error', errorMsg);
+      
+      // Restart timer if there's still time left
+      if (endTime && endTime - new Date() > 0) {
+        setupAntiCheat();
+        startTimer();
+      }
+      return;
+    }
+
+    // Submission successful - show thank you screen
+    console.log('Quiz submitted successfully:', result);
     
     // Use cached elements
     const elements = cacheElements();
