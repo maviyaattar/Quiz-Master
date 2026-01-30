@@ -72,7 +72,9 @@ const poll = setInterval(async () => {
       clearInterval(poll);
 
       questions = d.questions;
-      endTime = new Date(d.endTime);
+      // Subtract 5 seconds from backend endTime to create buffer
+      // Display shows 5 seconds less than actual time
+      endTime = new Date(new Date(d.endTime).getTime() - 5000);
 
       // PERFORMANCE: Cache DOM elements before starting quiz
       cacheElements();
@@ -105,15 +107,24 @@ function startTimer() {
   timerInt = setInterval(() => {
     const diff = endTime - new Date();
     
+    // Submit when timer reaches 0 (which is actually 5 seconds before backend end)
     if (diff <= 0) {
       submit(true); // Pass true to indicate timer-triggered submission
       return;
     }
     
-    // PERFORMANCE: Minimize string operations
+    // Calculate minutes and seconds for display
     const m = Math.floor(diff / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    elements.timer.innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+    
+    // Show countdown message when 10 seconds or less remain
+    if (diff <= 10000) {
+      const countdown = Math.ceil(diff / 1000);
+      elements.timer.innerText = `⏱ Submitting in ${countdown}...`;
+    } else {
+      // Normal timer display
+      elements.timer.innerText = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+    }
   }, 1000);
 }
 
