@@ -106,7 +106,7 @@ function startTimer() {
     const diff = endTime - new Date();
     
     if (diff <= 0) {
-      submit();
+      submit(true); // Pass true to indicate timer-triggered submission
       return;
     }
     
@@ -241,7 +241,7 @@ function confirmSubmit() {
 /* ==========================================
    SUBMIT QUIZ
    ========================================== */
-async function submit() {
+async function submit(isTimerTriggered = false) {
   clearInterval(timerInt);
   
   // Remove anti-cheat mechanisms and warning UI
@@ -271,7 +271,18 @@ async function submit() {
     // Hide loading overlay
     hideLoadingState();
 
-    // Check if submission was successful
+    // If timer triggered submission, always show thank you screen
+    // Backend has received the attempt regardless of response status
+    if (isTimerTriggered) {
+      console.log('Timer expired - quiz attempt recorded');
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+      return;
+    }
+
+    // For manual submissions, check if submission was successful
     if (!response.ok) {
       // Show error message from backend or generic message
       const errorMsg = result?.msg || 'Submission failed. Please try again.';
@@ -295,6 +306,19 @@ async function submit() {
     localStorage.removeItem("joiner");
   } catch (err) {
     console.error('Submit error:', err);
+    
+    // If timer triggered, still show thank you screen
+    // The attempt was made even if network failed
+    if (isTimerTriggered) {
+      console.log('Timer expired - showing completion screen despite error');
+      hideLoadingState();
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+      return;
+    }
+    
     showAlert('error', 'Failed to submit quiz. Please try again.');
     // Re-enable the quiz screen
     hideLoadingState();
