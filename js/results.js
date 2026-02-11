@@ -141,10 +141,10 @@ function renderParticipants(participants) {
             </div>
           </div>
           <div class="participant-score">
-            <strong>${u.score} pts</strong>
+            <strong>${escapeHtml(String(u.score))} pts</strong>
           </div>
           <div class="participant-actions">
-            <button class="btn-download" onclick="downloadPDF('${escapeHtml(u.name)}', '${escapeHtml(u.rollNo || '')}', ${u.score})" aria-label="Download PDF for ${escapeHtml(u.name)}">
+            <button class="btn-download" onclick="downloadPDF('${escapeHtml(u.name)}', '${escapeHtml(u.rollNo || '')}', '${escapeHtml(String(u.score))}')" aria-label="Download PDF for ${escapeHtml(u.name)}">
               <i class="fa fa-download"></i> PDF
             </button>
           </div>
@@ -158,11 +158,11 @@ function renderParticipants(participants) {
  * Download PDF for a participant
  * @param {string} name - Participant name
  * @param {string} rollNo - Participant roll number
- * @param {number} score - Participant score
+ * @param {string} score - Participant score
  */
 function downloadPDF(name, rollNo, score) {
   showNotification(
-    "PDF download functionality requires backend integration. The PDF was generated on submission.",
+    "Note: Individual PDF downloads are not yet available. PDFs were generated and downloaded when participants submitted their quiz.",
     "info"
   );
 }
@@ -226,7 +226,7 @@ async function loadLeaderboard() {
               <div class="leaderboard-name">${escapeHtml(u.name)}</div>
               <div class="leaderboard-rollno">${escapeHtml(u.rollNo || 'N/A')}</div>
             </div>
-            <strong class="leaderboard-score">${u.score} pts</strong>
+            <strong class="leaderboard-score">${escapeHtml(String(u.score))} pts</strong>
           </div>
         `;
       })
@@ -260,17 +260,17 @@ async function loadSummary() {
       <div class="summary-grid">
         <div class="summary-card">
           <i class="fa fa-users summary-icon"></i>
-          <div class="summary-value">${s.total}</div>
+          <div class="summary-value">${escapeHtml(String(s.total))}</div>
           <div class="summary-label">Total Participants</div>
         </div>
         <div class="summary-card">
           <i class="fa fa-trophy summary-icon"></i>
-          <div class="summary-value">${s.highest}</div>
+          <div class="summary-value">${escapeHtml(String(s.highest))}</div>
           <div class="summary-label">Highest Score</div>
         </div>
         <div class="summary-card">
           <i class="fa fa-chart-line summary-icon"></i>
-          <div class="summary-value">${s.average.toFixed(2)}</div>
+          <div class="summary-value">${escapeHtml(String(s.average.toFixed(2)))}</div>
           <div class="summary-label">Average Score</div>
         </div>
       </div>
