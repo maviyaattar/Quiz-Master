@@ -321,22 +321,13 @@ async function submit(isTimerTriggered = false) {
       body: JSON.stringify({ ...joiner, answers })
     });
 
-    // Parse response (try to get error message if submission failed)
-    let result = null;
-    try {
-      result = await response.json();
-    } catch (parseErr) {
-      // Response is not JSON, but that's okay for successful submissions
-      console.log('Submission completed, status:', response.status);
-    }
-
-    // Hide loading overlay
+    // Hide loading immediately after response arrives
     hideLoadingState();
 
-    // If timer triggered submission, always show thank you screen
-    // Backend has received the attempt regardless of response status
-    if (isTimerTriggered) {
-      console.log('Timer expired - quiz attempt recorded');
+    // Check if response is successful (200-299)
+    if (response.ok) {
+      // Success - show thank you screen immediately
+      console.log('Quiz submitted successfully');
       const elements = cacheElements();
       elements.quizScreen.classList.add("hide");
       elements.thankScreen.classList.remove("hide");
@@ -344,52 +335,41 @@ async function submit(isTimerTriggered = false) {
       return;
     }
 
-    // For manual submissions, check if submission was successful
-    if (!response.ok) {
-      // Show error message from backend or generic message
-      const errorMsg = result?.msg || 'Submission failed. Please try again.';
-      showAlert('error', errorMsg);
+    // If not OK, try to parse error message
+    let errorMsg = 'Submission failed. Please try again.';
+    try {
+      const result = await response.json();
+      errorMsg = result?.msg || errorMsg;
+    } catch (e) {
+      console.log('Could not parse error response');
+    }
+
+    showAlert('error', errorMsg);
+    
+    // Restart timer if there's time left
+    if (endTime && endTime - new Date() > 0) {
+      setupAntiCheat();
+      startTimer();
+    }
+
+  } catch (err) {
+    console.error('Submit error:', err);
+    hideLoadingState();
+    
+    if (isTimerTriggered) {
+      // Timer expired - still show thank you screen
+      console.log('Timer expired - showing completion screen');
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+    } else {
+      showAlert('error', 'Failed to submit quiz. Please try again.');
       
-      // Restart timer if there's still time left
       if (endTime && endTime - new Date() > 0) {
         setupAntiCheat();
         startTimer();
       }
-      return;
-    }
-
-    // Submission successful - show thank you screen
-    console.log('Quiz submitted successfully:', result);
-    
-    // Use cached elements
-    const elements = cacheElements();
-    elements.quizScreen.classList.add("hide");
-    elements.thankScreen.classList.remove("hide");
-    localStorage.removeItem("joiner");
-  } catch (err) {
-    console.error('Submit error:', err);
-    
-    // If timer triggered, still show thank you screen
-    // The attempt was made even if network failed
-    if (isTimerTriggered) {
-      console.log('Timer expired - showing completion screen despite error');
-      hideLoadingState();
-      const elements = cacheElements();
-      elements.quizScreen.classList.add("hide");
-      elements.thankScreen.classList.remove("hide");
-      localStorage.removeItem("joiner");
-      return;
-    }
-    
-    showAlert('error', 'Failed to submit quiz. Please try again.');
-    // Re-enable the quiz screen
-    hideLoadingState();
-    
-    // Restart timer if there's still time left
-    if (endTime && endTime - new Date() > 0) {
-      // Re-enable anti-cheat mechanisms since quiz is still active
-      setupAntiCheat();
-      startTimer();
     }
   }
 }
@@ -560,11 +540,15 @@ function showAlert(type, message) {
 
   alertContainer.appendChild(alert);
 
-  // Auto-remove alert after 4 seconds
+  // Auto-remove after delay - info messages shorter
   setTimeout(() => {
     alert.style.animation = 'slideOutRight 0.3s ease-out';
-    setTimeout(() => alert.remove(), 300);
-  }, 4000);
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.remove();
+      }
+    }, 300);
+  }, type === 'info' ? 2000 : 4000);
 }
 
 /* ==========================================
