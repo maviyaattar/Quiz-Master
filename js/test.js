@@ -195,13 +195,31 @@ async function startQuiz() {
           },
         });
 
+        // Hide loading immediately after response arrives
+        hideLoadingState();
+
+        // Check if response is successful
         if (!response.ok) {
-          throw new Error("Failed to start quiz");
+          let errorMsg = "Failed to start quiz";
+          try {
+            const result = await response.json();
+            errorMsg = result?.msg || errorMsg;
+          } catch (e) {
+            console.log("Could not parse error response");
+          }
+          throw new Error(errorMsg);
         }
 
-        const data = await response.json();
-        hideLoadingState();
-        showNotification(data.msg || "Quiz started successfully!", "success");
+        // Parse success message
+        let successMsg = "Quiz started successfully!";
+        try {
+          const data = await response.json();
+          successMsg = data?.msg || successMsg;
+        } catch (e) {
+          console.log("Using default success message");
+        }
+        
+        showNotification(successMsg, "success");
 
         // Reload quiz details
         setTimeout(() => {
@@ -210,7 +228,7 @@ async function startQuiz() {
       } catch (err) {
         console.error("Error starting quiz:", err);
         hideLoadingState();
-        showNotification("Failed to start quiz", "error");
+        showNotification(err.message || "Failed to start quiz", "error");
       }
     }
   );
@@ -234,13 +252,31 @@ async function deleteQuiz() {
           },
         });
 
+        // Hide loading immediately after response arrives
+        hideLoadingState();
+
+        // Check if response is successful
         if (!response.ok) {
-          throw new Error("Failed to delete quiz");
+          let errorMsg = "Failed to delete quiz";
+          try {
+            const result = await response.json();
+            errorMsg = result?.msg || errorMsg;
+          } catch (e) {
+            console.log("Could not parse error response");
+          }
+          throw new Error(errorMsg);
         }
 
-        const data = await response.json();
-        hideLoadingState();
-        showNotification(data.msg || "Quiz deleted successfully!", "success");
+        // Parse success message
+        let successMsg = "Quiz deleted successfully!";
+        try {
+          const data = await response.json();
+          successMsg = data?.msg || successMsg;
+        } catch (e) {
+          console.log("Using default success message");
+        }
+        
+        showNotification(successMsg, "success");
 
         // Redirect to dashboard after brief delay
         setTimeout(() => {
@@ -249,7 +285,7 @@ async function deleteQuiz() {
       } catch (err) {
         console.error("Error deleting quiz:", err);
         hideLoadingState();
-        showNotification("Failed to delete quiz", "error");
+        showNotification(err.message || "Failed to delete quiz", "error");
       }
     }
   );
@@ -283,7 +319,9 @@ async function resetQuiz() {
           },
         });
 
+        // Check if fetch was successful
         if (!quizResponse.ok) {
+          hideLoadingState();
           throw new Error("Failed to load quiz data");
         }
 
@@ -304,12 +342,23 @@ async function resetQuiz() {
           }),
         });
 
+        // Hide loading immediately after response arrives
+        hideLoadingState();
+
+        // Check if create was successful
         if (!createResponse.ok) {
-          throw new Error("Failed to create cloned quiz");
+          let errorMsg = "Failed to create cloned quiz";
+          try {
+            const result = await createResponse.json();
+            errorMsg = result?.msg || errorMsg;
+          } catch (e) {
+            console.log("Could not parse error response");
+          }
+          throw new Error(errorMsg);
         }
 
+        // Get the new quiz code
         const newQuiz = await createResponse.json();
-        hideLoadingState();
         showNotification("Quiz cloned successfully! Redirecting...", "success");
 
         // Redirect to the new quiz
@@ -319,7 +368,7 @@ async function resetQuiz() {
       } catch (err) {
         console.error("Error resetting quiz:", err);
         hideLoadingState();
-        showNotification("Failed to reset quiz. Please try again.", "error");
+        showNotification(err.message || "Failed to reset quiz. Please try again.", "error");
       }
     }
   );
