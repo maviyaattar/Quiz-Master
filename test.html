@@ -124,50 +124,19 @@
           <h2 id="detailTitle">Loading...</h2>
           <p id="detailDesc"></p>
 
-          <!-- Tabs -->
-          <div class="tabs">
+          <!-- Show Results Button -->
+          <div class="results-action">
             <button
-              class="tab-btn active"
-              onclick="switchTab('participants', this)"
-              aria-label="View participants"
+              class="results-btn"
+              onclick="showResults()"
+              aria-label="View detailed results"
             >
-              <i class="fa fa-users"></i> Participants
+              <i class="fa fa-chart-line"></i> Show Results
             </button>
-            <button
-              class="tab-btn"
-              onclick="switchTab('leaderboard', this)"
-              aria-label="View leaderboard"
-            >
-              <i class="fa fa-chart-bar"></i> Leaderboard
-            </button>
-            <button
-              class="tab-btn"
-              onclick="switchTab('summary', this)"
-              aria-label="View summary statistics"
-            >
-              <i class="fa fa-info-circle"></i> Summary
-            </button>
+            <p class="results-hint">
+              View detailed participant data, leaderboard, and quiz summary
+            </p>
           </div>
-
-          <!-- Tab Content -->
-          <div
-            id="participants"
-            class="tab-content active"
-            role="region"
-            aria-live="polite"
-          ></div>
-          <div
-            id="leaderboard"
-            class="tab-content"
-            role="region"
-            aria-live="polite"
-          ></div>
-          <div
-            id="summary"
-            class="tab-content"
-            role="region"
-            aria-live="polite"
-          ></div>
         </div>
       </div>
     </div>
