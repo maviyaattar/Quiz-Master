@@ -70,6 +70,43 @@
           max="480"
           aria-label="Test duration in minutes"
         />
+        <input
+          class="input"
+          id="orgName"
+          placeholder="Organization Name (optional)"
+          type="text"
+          aria-label="Organization name"
+          maxlength="100"
+        />
+        <div style="margin-top: 15px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
+            <i class="fa fa-image"></i> Logo Upload (optional)
+          </label>
+          <input
+            type="file"
+            id="logoUpload"
+            accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+            aria-label="Upload organization logo"
+            style="display: block; margin-bottom: 10px;"
+          />
+          <div id="logoPreview" style="display: none; margin-top: 10px;">
+            <img id="logoPreviewImg" src="" alt="Logo preview" style="max-width: 200px; max-height: 100px; border-radius: 8px; border: 2px solid var(--primary);" />
+            <button type="button" onclick="removeLogo()" style="display: block; margin-top: 8px; padding: 6px 12px; background: var(--danger, #ef4444); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+              <i class="fa fa-times"></i> Remove Logo
+            </button>
+          </div>
+        </div>
+        <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+          <input
+            type="checkbox"
+            id="negativeMarking"
+            aria-label="Enable negative marking"
+            style="width: 18px; height: 18px; cursor: pointer;"
+          />
+          <label for="negativeMarking" style="font-weight: 500; color: var(--text); cursor: pointer; user-select: none;">
+            Enable Negative Marking (-0.25 for wrong answers)
+          </label>
+        </div>
       </div>
 
       <!-- ===== QUESTION BUILDER ===== -->

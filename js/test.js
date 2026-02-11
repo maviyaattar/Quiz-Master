@@ -169,127 +169,12 @@ async function loadQuiz() {
   }
 }
 
-/* ===== PARTICIPANTS TAB ===== */
+/* ===== SHOW RESULTS ===== */
 /**
- * Load participants list
+ * Navigate to results page
  */
-async function loadParticipants() {
-  const container = document.getElementById("participants");
-  container.innerHTML =
-    '<div class="loading-skeleton"></div><div class="loading-skeleton"></div>';
-
-  try {
-    const response = await fetch(`${API}/api/quiz/leaderboard/${code}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to load participants");
-    }
-
-    const data = await response.json();
-
-    if (!data || data.length === 0) {
-      container.innerHTML =
-        '<p style="text-align: center; color: var(--muted); padding: 20px;">No participants yet</p>';
-      return;
-    }
-
-    container.innerHTML = data
-      .map((u) => {
-        return `
-          <div class="list-item">
-            <span>${escapeHtml(u.name)} <small style="color: var(--muted);">(${escapeHtml(u.rollNo)})</small></span>
-            <strong>${u.score} pts</strong>
-          </div>
-        `;
-      })
-      .join("");
-  } catch (err) {
-    console.error("Error loading participants:", err);
-    container.innerHTML =
-      '<p style="color: var(--danger);">Failed to load participants</p>';
-  }
-}
-
-/* ===== LEADERBOARD TAB ===== */
-/**
- * Load leaderboard
- */
-async function loadLeaderboard() {
-  const container = document.getElementById("leaderboard");
-  container.innerHTML =
-    '<div class="loading-skeleton"></div><div class="loading-skeleton"></div>';
-
-  try {
-    const response = await fetch(`${API}/api/quiz/leaderboard/${code}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to load leaderboard");
-    }
-
-    const data = await response.json();
-
-    if (!data || data.length === 0) {
-      container.innerHTML =
-        '<p style="text-align: center; color: var(--muted); padding: 20px;">No results yet</p>';
-      return;
-    }
-
-    container.innerHTML = data
-      .map((u, i) => {
-        const medal =
-          i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`;
-        return `
-          <div class="list-item">
-            <span>${medal} ${escapeHtml(u.name)}</span>
-            <strong>${u.score} pts</strong>
-          </div>
-        `;
-      })
-      .join("");
-  } catch (err) {
-    console.error("Error loading leaderboard:", err);
-    container.innerHTML =
-      '<p style="color: var(--danger);">Failed to load leaderboard</p>';
-  }
-}
-
-/* ===== SUMMARY TAB ===== */
-/**
- * Load quiz summary statistics
- */
-async function loadSummary() {
-  const container = document.getElementById("summary");
-  container.innerHTML =
-    '<div class="loading-skeleton"></div><div class="loading-skeleton"></div>';
-
-  try {
-    const response = await fetch(`${API}/api/quiz/summary/${code}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to load summary");
-    }
-
-    const s = await response.json();
-
-    container.innerHTML = `
-      <div class="list-item">
-        <span><i class="fa fa-users"></i> Total Participants</span>
-        <strong>${s.total}</strong>
-      </div>
-      <div class="list-item">
-        <span><i class="fa fa-trophy"></i> Highest Score</span>
-        <strong>${s.highest}</strong>
-      </div>
-      <div class="list-item">
-        <span><i class="fa fa-chart-line"></i> Average Score</span>
-        <strong>${s.average.toFixed(2)}</strong>
-      </div>
-    `;
-  } catch (err) {
-    console.error("Error loading summary:", err);
-    container.innerHTML =
-      '<p style="color: var(--danger);">Failed to load summary</p>';
-  }
+function showResults() {
+  location.href = `results.html?code=${encodeURIComponent(code)}`;
 }
 
 /* ===== START QUIZ ===== */
@@ -440,38 +325,10 @@ async function resetQuiz() {
   );
 }
 
-/* ===== TAB SWITCHING ===== */
-/**
- * Switch between tabs
- * @param {string} tabName - Name of tab to show
- * @param {HTMLElement} btn - Button element clicked
- */
-function switchTab(tabName, btn) {
-  // Remove active class from all tabs and buttons
-  document
-    .querySelectorAll(".tab-content")
-    .forEach((t) => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-
-  // Add active class to selected tab and button
-  document.getElementById(tabName).classList.add("active");
-  btn.classList.add("active");
-
-  // Load content based on tab
-  if (tabName === "participants") {
-    loadParticipants();
-  } else if (tabName === "leaderboard") {
-    loadLeaderboard();
-  } else if (tabName === "summary") {
-    loadSummary();
-  }
-}
-
 /* ===== INITIALIZATION ===== */
 document.addEventListener("DOMContentLoaded", () => {
-  // Load quiz and initial tab
+  // Load quiz details
   loadQuiz();
-  loadParticipants(); // Default tab
 
   // Add animation styles
   addAnimationStyles();

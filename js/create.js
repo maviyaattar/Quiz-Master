@@ -17,6 +17,7 @@ if (!token) {
 let questions = [];
 let editIndex = null;
 let isSubmitting = false;
+let logoUrl = null;
 
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
@@ -52,6 +53,81 @@ function escapeHtml(text) {
  */
 function goBack() {
   location.href = "dashboard.html";
+}
+
+/* ===== LOGO UPLOAD HANDLING ===== */
+/**
+ * Handle logo file selection and upload
+ */
+async function handleLogoUpload(file) {
+  if (!file) return;
+
+  // Validate file type
+  const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    showAlert("error", "Please upload a valid image file (PNG, JPG, GIF, or WebP)");
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showAlert("error", "Logo file size must be less than 5MB");
+    return;
+  }
+
+  // Show loading state
+  showAlert("info", "Uploading logo...");
+
+  try {
+    // Create form data for upload
+    const formData = new FormData();
+    formData.append('logo', file);
+
+    // Upload to backend
+    const response = await fetch(`${API_BASE}/api/upload-logo`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to upload logo');
+    }
+
+    const data = await response.json();
+    logoUrl = data.url;
+
+    // Show preview
+    const preview = document.getElementById('logoPreview');
+    const previewImg = document.getElementById('logoPreviewImg');
+    previewImg.src = logoUrl;
+    preview.style.display = 'block';
+
+    showAlert("success", "Logo uploaded successfully!");
+  } catch (err) {
+    console.error("Error uploading logo:", err);
+    showAlert("error", err.message || "Failed to upload logo. Please try again.");
+    logoUrl = null;
+  }
+}
+
+/**
+ * Remove uploaded logo
+ */
+function removeLogo() {
+  logoUrl = null;
+  const preview = document.getElementById('logoPreview');
+  const previewImg = document.getElementById('logoPreviewImg');
+  const fileInput = document.getElementById('logoUpload');
+  
+  preview.style.display = 'none';
+  previewImg.src = '';
+  fileInput.value = '';
+  
+  showAlert("info", "Logo removed");
 }
 
 /* ===== QUESTION MANAGEMENT: SAVE ===== */
@@ -234,10 +310,14 @@ async function createTest() {
   const titleInput = document.getElementById("testTitle");
   const descInput = document.getElementById("testDesc");
   const durationInput = document.getElementById("testDuration");
+  const orgNameInput = document.getElementById("orgName");
+  const negativeMarkingCheckbox = document.getElementById("negativeMarking");
 
   const title = sanitizeInput(titleInput.value.trim());
   const description = sanitizeInput(descInput.value.trim());
   const durationMin = Number(durationInput.value);
+  const orgName = sanitizeInput(orgNameInput.value.trim());
+  const negativeMarking = negativeMarkingCheckbox.checked;
 
   // Validation
   if (!title) {
@@ -269,6 +349,17 @@ async function createTest() {
       duration: durationMin * 60 + 20, // Convert minutes to seconds and add 20 second buffer
       questions,
     };
+
+    // Add optional fields if provided
+    if (orgName) {
+      payload.orgName = orgName;
+    }
+    if (logoUrl) {
+      payload.logoUrl = logoUrl;
+    }
+    if (negativeMarking) {
+      payload.negativeMarking = true;
+    }
 
     const response = await fetch(`${API_BASE}/api/quiz/create`, {
       method: "POST",
@@ -371,6 +462,17 @@ document.addEventListener("DOMContentLoaded", () => {
     questionTextInput.addEventListener("keydown", (e) => {
       if (e.ctrlKey && e.key === "Enter") {
         saveQuestion();
+      }
+    });
+  }
+
+  // Logo upload handler
+  const logoUploadInput = document.getElementById("logoUpload");
+  if (logoUploadInput) {
+    logoUploadInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleLogoUpload(file);
       }
     });
   }

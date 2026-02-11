@@ -7,6 +7,10 @@ const API = "https://quiz-backend-production-4aaf.up.railway.app";
 const code = new URLSearchParams(location.search).get("code");
 const joiner = JSON.parse(localStorage.getItem("joiner"));
 
+// Animation timing constants
+const LOADING_ANIMATION_DURATION = 300; // milliseconds for fade out
+const SCREEN_TRANSITION_DELAY = 400; // milliseconds before showing thank you screen
+
 // Validate and redirect if missing data
 if (!code || !joiner) {
   location.href = "join.html";
@@ -84,6 +88,9 @@ const poll = setInterval(async () => {
       elements.waitScreen.classList.add("hide");
       elements.quizScreen.classList.remove("hide");
 
+      // Display branding if available
+      displayBranding(d);
+
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
       
@@ -98,6 +105,58 @@ const poll = setInterval(async () => {
     console.log('Waiting for quiz to start...');
   }
 }, 3000);
+
+/* ==========================================
+   DISPLAY BRANDING
+   ========================================== */
+function displayBranding(quizData) {
+  // Debug logging to diagnose branding display issues
+  // TODO: Remove or make conditional based on environment in production
+  console.log('Quiz data received:', quizData);
+  
+  const brandingSection = document.getElementById('brandingSection');
+  const brandingLogo = document.getElementById('brandingLogo');
+  const brandingOrgName = document.getElementById('brandingOrgName');
+  const brandingQuizTitle = document.getElementById('brandingQuizTitle');
+
+  if (!brandingSection || !brandingLogo || !brandingOrgName || !brandingQuizTitle) {
+    console.error('Branding elements not found in DOM');
+    return;
+  }
+
+  let hasContent = false;
+
+  // Display logo if available
+  if (quizData.logoUrl) {
+    console.log('Setting logo URL:', quizData.logoUrl);
+    brandingLogo.src = quizData.logoUrl;
+    brandingLogo.style.display = 'block';
+    hasContent = true;
+  }
+
+  // Display organization name if available
+  if (quizData.orgName) {
+    console.log('Setting org name:', quizData.orgName);
+    brandingOrgName.textContent = sanitizeText(quizData.orgName);
+    brandingOrgName.style.display = 'block';
+    hasContent = true;
+  }
+
+  // Display quiz title
+  if (quizData.title) {
+    console.log('Setting quiz title:', quizData.title);
+    brandingQuizTitle.textContent = sanitizeText(quizData.title);
+    hasContent = true;
+  }
+
+  // Show branding section if there's content to display
+  if (hasContent) {
+    console.log('Showing branding section');
+    brandingSection.style.display = 'block';
+  } else {
+    console.log('No branding content to display');
+  }
+}
 
 /* ==========================================
    TIMER FUNCTIONALITY
@@ -288,10 +347,13 @@ async function submit(isTimerTriggered = false) {
     // Backend has received the attempt regardless of response status
     if (isTimerTriggered) {
       console.log('Timer expired - quiz attempt recorded');
-      const elements = cacheElements();
-      elements.quizScreen.classList.add("hide");
-      elements.thankScreen.classList.remove("hide");
-      localStorage.removeItem("joiner");
+      // Wait for loading overlay to fade out before showing thank you
+      setTimeout(() => {
+        const elements = cacheElements();
+        elements.quizScreen.classList.add("hide");
+        elements.thankScreen.classList.remove("hide");
+        localStorage.removeItem("joiner");
+      }, SCREEN_TRANSITION_DELAY);
       return;
     }
 
@@ -312,11 +374,13 @@ async function submit(isTimerTriggered = false) {
     // Submission successful - show thank you screen
     console.log('Quiz submitted successfully:', result);
     
-    // Use cached elements
-    const elements = cacheElements();
-    elements.quizScreen.classList.add("hide");
-    elements.thankScreen.classList.remove("hide");
-    localStorage.removeItem("joiner");
+    // Wait for loading overlay to fade out before showing thank you
+    setTimeout(() => {
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+    }, SCREEN_TRANSITION_DELAY);
   } catch (err) {
     console.error('Submit error:', err);
     
@@ -325,10 +389,13 @@ async function submit(isTimerTriggered = false) {
     if (isTimerTriggered) {
       console.log('Timer expired - showing completion screen despite error');
       hideLoadingState();
-      const elements = cacheElements();
-      elements.quizScreen.classList.add("hide");
-      elements.thankScreen.classList.remove("hide");
-      localStorage.removeItem("joiner");
+      // Wait for loading overlay to fade out
+      setTimeout(() => {
+        const elements = cacheElements();
+        elements.quizScreen.classList.add("hide");
+        elements.thankScreen.classList.remove("hide");
+        localStorage.removeItem("joiner");
+      }, SCREEN_TRANSITION_DELAY);
       return;
     }
     
@@ -664,7 +731,13 @@ function showLoadingState() {
 function hideLoadingState() {
   const loadingOverlay = document.getElementById('loadingOverlay');
   if (loadingOverlay) {
-    loadingOverlay.remove();
+    // Add fade out animation before removing
+    loadingOverlay.style.animation = `fadeOut ${LOADING_ANIMATION_DURATION}ms ease-out`;
+    setTimeout(() => {
+      if (loadingOverlay && loadingOverlay.parentNode) {
+        loadingOverlay.remove();
+      }
+    }, LOADING_ANIMATION_DURATION);
   }
 }
 
