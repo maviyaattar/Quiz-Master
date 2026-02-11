@@ -124,50 +124,22 @@
           <h2 id="detailTitle">Loading...</h2>
           <p id="detailDesc"></p>
 
-          <!-- Tabs -->
-          <div class="tabs">
+          <!-- Results Section -->
+          <div class="results-section">
+            <h3 style="margin-bottom: 16px; color: var(--text);">
+              <i class="fa fa-chart-bar"></i> Quiz Results
+            </h3>
+            <p style="color: var(--muted); margin-bottom: 20px;">
+              View detailed results, leaderboard, and participant submissions
+            </p>
             <button
-              class="tab-btn active"
-              onclick="switchTab('participants', this)"
-              aria-label="View participants"
+              class="results-btn"
+              onclick="showResults()"
+              aria-label="Show quiz results"
             >
-              <i class="fa fa-users"></i> Participants
-            </button>
-            <button
-              class="tab-btn"
-              onclick="switchTab('leaderboard', this)"
-              aria-label="View leaderboard"
-            >
-              <i class="fa fa-chart-bar"></i> Leaderboard
-            </button>
-            <button
-              class="tab-btn"
-              onclick="switchTab('summary', this)"
-              aria-label="View summary statistics"
-            >
-              <i class="fa fa-info-circle"></i> Summary
+              <i class="fa fa-trophy"></i> Show Results
             </button>
           </div>
-
-          <!-- Tab Content -->
-          <div
-            id="participants"
-            class="tab-content active"
-            role="region"
-            aria-live="polite"
-          ></div>
-          <div
-            id="leaderboard"
-            class="tab-content"
-            role="region"
-            aria-live="polite"
-          ></div>
-          <div
-            id="summary"
-            class="tab-content"
-            role="region"
-            aria-live="polite"
-          ></div>
         </div>
       </div>
     </div>

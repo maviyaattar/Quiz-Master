@@ -70,6 +70,70 @@
           max="480"
           aria-label="Test duration in minutes"
         />
+        
+        <!-- Optional Fields -->
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <h4 style="font-size: 14px; color: var(--muted); margin-bottom: 14px;">
+            <i class="fa fa-sliders-h"></i> Optional Settings
+          </h4>
+          
+          <!-- Organization Name -->
+          <input
+            class="input"
+            id="orgName"
+            placeholder="Organization Name (Optional)"
+            type="text"
+            aria-label="Organization name (optional)"
+            maxlength="100"
+          />
+          
+          <!-- Logo Upload -->
+          <div class="logo-upload-section">
+            <label for="logoUpload" class="upload-label">
+              <i class="fa fa-image"></i> Upload Logo (Optional)
+            </label>
+            <input
+              type="file"
+              id="logoUpload"
+              accept="image/*"
+              aria-label="Upload logo image"
+              style="display: none;"
+              onchange="handleLogoUpload(event)"
+            />
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              onclick="document.getElementById('logoUpload').click()"
+              aria-label="Choose logo file"
+            >
+              <i class="fa fa-upload"></i> Choose Logo
+            </button>
+            <div id="logoPreview" class="logo-preview" style="display: none;">
+              <img id="logoPreviewImage" src="" alt="Logo preview" />
+              <button 
+                type="button" 
+                class="remove-logo-btn" 
+                onclick="removeLogo()"
+                aria-label="Remove logo"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div id="logoUploadStatus" class="upload-status"></div>
+          </div>
+          
+          <!-- Negative Marking -->
+          <div class="checkbox-option">
+            <input
+              type="checkbox"
+              id="negativeMarking"
+              aria-label="Enable negative marking"
+            />
+            <label for="negativeMarking">
+              Enable Negative Marking (Incorrect answers deduct 0.25 points)
+            </label>
+          </div>
+        </div>
       </div>
 
       <!-- ===== QUESTION BUILDER ===== -->
