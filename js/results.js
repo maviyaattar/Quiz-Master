@@ -47,6 +47,20 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
+/**
+ * Escapes text for use in JavaScript string context (onclick, etc.)
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeJsString(text) {
+  return text
+    .replace(/\\/g, '\\\\')  // Escape backslashes first
+    .replace(/'/g, "\\'")     // Escape single quotes
+    .replace(/"/g, '\\"')     // Escape double quotes
+    .replace(/\n/g, '\\n')    // Escape newlines
+    .replace(/\r/g, '\\r');   // Escape carriage returns
+}
+
 /* ===== NAVIGATION ===== */
 /**
  * Navigate back to quiz details page
@@ -254,7 +268,7 @@ function renderParticipants() {
               <td>
                 <button 
                   class="pdf-btn" 
-                  onclick="downloadPDF('${p.rollNo.replace(/'/g, "\\'")}')"
+                  onclick="downloadPDF('${escapeJsString(p.rollNo)}')"
                   aria-label="Download PDF for ${escapeHtml(p.name)}"
                 >
                   <i class="fa fa-download"></i> PDF
