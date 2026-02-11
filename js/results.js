@@ -202,6 +202,18 @@ function renderCurrentTab() {
   // Summary tab doesn't use filtering
 }
 
+/**
+ * Transform participant data to ensure consistent branch field
+ * @param {Array} data - Raw participant data from API
+ * @returns {Array} Transformed participant data with branch field
+ */
+function transformParticipantData(data) {
+  return (data || []).map(participant => ({
+    ...participant,
+    branch: participant.branch || 'N/A'
+  }));
+}
+
 /* ===== PARTICIPANTS TAB ===== */
 /**
  * Load participants list
@@ -223,13 +235,7 @@ async function loadParticipants() {
     }
 
     const data = await response.json();
-    
-    // Map the data to include branch if available
-    allParticipants = (data || []).map(participant => ({
-      ...participant,
-      branch: participant.branch || 'N/A'
-    }));
-    
+    allParticipants = transformParticipantData(data);
     filteredParticipants = [...allParticipants];
     
     // Apply current search if any
@@ -309,13 +315,7 @@ async function loadLeaderboard() {
     }
 
     const data = await response.json();
-    
-    // Map the data to include branch if available
-    allParticipants = (data || []).map(participant => ({
-      ...participant,
-      branch: participant.branch || 'N/A'
-    }));
-    
+    allParticipants = transformParticipantData(data);
     filteredParticipants = [...allParticipants];
     
     // Apply current search if any
