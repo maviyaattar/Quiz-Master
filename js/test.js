@@ -325,7 +325,15 @@ async function resetQuiz() {
           throw new Error("Failed to load quiz data");
         }
 
-        const quizData = await quizResponse.json();
+        // Parse quiz data
+        let quizData;
+        try {
+          quizData = await quizResponse.json();
+        } catch (e) {
+          hideLoadingState();
+          console.error("Could not parse quiz data:", e);
+          throw new Error("Failed to read quiz data");
+        }
         
         // Create a new quiz with the same data (clone)
         const createResponse = await fetch(`${API}/api/quiz/create`, {
@@ -363,7 +371,7 @@ async function resetQuiz() {
           newQuiz = await createResponse.json();
         } catch (e) {
           console.error("Could not parse success response:", e);
-          throw new Error("Quiz created but failed to get code. Please check dashboard.");
+          throw new Error("Failed to confirm quiz creation. Please check dashboard.");
         }
         showNotification("Quiz cloned successfully! Redirecting...", "success");
 
