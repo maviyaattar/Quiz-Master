@@ -205,7 +205,7 @@ async function startQuiz() {
             const result = await response.json();
             errorMsg = result?.msg || errorMsg;
           } catch (e) {
-            console.log("Could not parse error response");
+            console.error("Could not parse error response:", e);
           }
           throw new Error(errorMsg);
         }
@@ -216,7 +216,7 @@ async function startQuiz() {
           const data = await response.json();
           successMsg = data?.msg || successMsg;
         } catch (e) {
-          console.log("Using default success message");
+          console.warn("Could not parse success response, using default message");
         }
         
         showNotification(successMsg, "success");
@@ -262,7 +262,7 @@ async function deleteQuiz() {
             const result = await response.json();
             errorMsg = result?.msg || errorMsg;
           } catch (e) {
-            console.log("Could not parse error response");
+            console.error("Could not parse error response:", e);
           }
           throw new Error(errorMsg);
         }
@@ -273,7 +273,7 @@ async function deleteQuiz() {
           const data = await response.json();
           successMsg = data?.msg || successMsg;
         } catch (e) {
-          console.log("Using default success message");
+          console.warn("Could not parse success response, using default message");
         }
         
         showNotification(successMsg, "success");
@@ -352,13 +352,19 @@ async function resetQuiz() {
             const result = await createResponse.json();
             errorMsg = result?.msg || errorMsg;
           } catch (e) {
-            console.log("Could not parse error response");
+            console.error("Could not parse error response:", e);
           }
           throw new Error(errorMsg);
         }
 
         // Get the new quiz code
-        const newQuiz = await createResponse.json();
+        let newQuiz = { code: null };
+        try {
+          newQuiz = await createResponse.json();
+        } catch (e) {
+          console.error("Could not parse success response:", e);
+          throw new Error("Quiz created but failed to get code. Please check dashboard.");
+        }
         showNotification("Quiz cloned successfully! Redirecting...", "success");
 
         // Redirect to the new quiz
