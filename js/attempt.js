@@ -29,6 +29,8 @@ let index = 0;
 let endTime = null;
 let timerInt = null;
 let warnings = 0;
+let orgName = null; // Store organization name
+let logoUrl = null; // Store logo URL
 
 // PERFORMANCE: Cache frequently accessed DOM elements to avoid repeated lookups
 let cachedElements = null;
@@ -53,6 +55,46 @@ function cacheElements() {
 }
 
 /* ==========================================
+   DISPLAY ORGANIZATION INFO
+   ========================================== */
+function displayOrganizationInfo() {
+  // Check if org header already exists
+  let orgHeader = document.getElementById('orgHeader');
+  
+  // Only display if we have orgName or logoUrl
+  if (!orgName && !logoUrl) {
+    return;
+  }
+  
+  if (!orgHeader) {
+    // Create org header element
+    orgHeader = document.createElement('div');
+    orgHeader.id = 'orgHeader';
+    orgHeader.className = 'org-header';
+    
+    // Insert at the top of quiz screen, before quiz-header
+    const quizScreen = document.getElementById('quizScreen');
+    const quizHeader = quizScreen.querySelector('.quiz-header');
+    quizScreen.insertBefore(orgHeader, quizHeader);
+  }
+  
+  let content = '<div class="org-content">';
+  
+  // Add logo if available
+  if (logoUrl) {
+    content += `<img src="${sanitizeText(logoUrl)}" alt="Organization logo" class="org-logo" />`;
+  }
+  
+  // Add org name if available
+  if (orgName) {
+    content += `<h3 class="org-name">${sanitizeText(orgName)}</h3>`;
+  }
+  
+  content += '</div>';
+  orgHeader.innerHTML = content;
+}
+
+/* ==========================================
    WAIT FOR START - AUTO POLLING
    ========================================== */
 const poll = setInterval(async () => {
@@ -72,6 +114,10 @@ const poll = setInterval(async () => {
       clearInterval(poll);
 
       questions = d.questions;
+      // Store org name and logo URL if provided
+      orgName = d.orgName || null;
+      logoUrl = d.logoUrl || null;
+      
       // Subtract 20 seconds from backend endTime to create buffer
       // Display shows 20 seconds less than actual time
       endTime = new Date(new Date(d.endTime).getTime() - 20000);
@@ -83,6 +129,9 @@ const poll = setInterval(async () => {
       const elements = cacheElements();
       elements.waitScreen.classList.add("hide");
       elements.quizScreen.classList.remove("hide");
+
+      // Display organization info if available
+      displayOrganizationInfo();
 
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
