@@ -17,6 +17,7 @@ if (!token) {
 let questions = [];
 let editIndex = null;
 let isSubmitting = false;
+let logoUrl = null; // Store uploaded logo URL
 
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
@@ -234,10 +235,14 @@ async function createTest() {
   const titleInput = document.getElementById("testTitle");
   const descInput = document.getElementById("testDesc");
   const durationInput = document.getElementById("testDuration");
+  const orgNameInput = document.getElementById("orgName");
+  const negativeMarkingInput = document.getElementById("negativeMarking");
 
   const title = sanitizeInput(titleInput.value.trim());
   const description = sanitizeInput(descInput.value.trim());
   const durationMin = Number(durationInput.value);
+  const orgName = sanitizeInput(orgNameInput.value.trim());
+  const negativeMarking = negativeMarkingInput.checked;
 
   // Validation
   if (!title) {
@@ -268,6 +273,9 @@ async function createTest() {
       description,
       duration: durationMin * 60 + 20, // Convert minutes to seconds and add 20 second buffer
       questions,
+      orgName: orgName || undefined, // Include only if provided
+      logoUrl: logoUrl || undefined, // Include only if uploaded
+      negativeMarking: negativeMarking, // Include checkbox value
     };
 
     const response = await fetch(`${API_BASE}/api/quiz/create`, {
@@ -530,4 +538,119 @@ function showConfirmDialog(message, onConfirm) {
       setTimeout(() => overlay.remove(), 300);
     }
   };
+}
+
+/* ===== LOGO UPLOAD HANDLING ===== */
+/**
+ * Handle logo file upload
+ * @param {Event} event - File input change event
+ */
+async function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  
+  if (!file) {
+    return;
+  }
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    showAlert('error', 'Please upload a valid image file');
+    event.target.value = ''; // Clear the file input
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+  if (file.size > maxSize) {
+    showAlert('error', 'Logo file size must be less than 5MB');
+    event.target.value = ''; // Clear the file input
+    return;
+  }
+
+  // Show uploading status
+  const statusEl = document.getElementById('logoUploadStatus');
+  statusEl.className = 'upload-status uploading';
+  statusEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading logo...';
+
+  try {
+    // Create form data
+    const formData = new FormData();
+    formData.append('logo', file);
+
+    // Upload to backend
+    const response = await fetch(`${API_BASE}/api/upload-logo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.msg || 'Failed to upload logo');
+    }
+
+    // Store the logo URL
+    logoUrl = data.url;
+
+    // Show preview
+    const previewEl = document.getElementById('logoPreview');
+    const previewImg = document.getElementById('logoPreviewImage');
+    previewImg.src = logoUrl;
+    previewEl.style.display = 'inline-block';
+
+    // Show success status
+    statusEl.className = 'upload-status success';
+    statusEl.innerHTML = '<i class="fa fa-check"></i> Logo uploaded successfully';
+
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      statusEl.innerHTML = '';
+      statusEl.className = 'upload-status';
+    }, 3000);
+
+    showAlert('success', 'Logo uploaded successfully!');
+  } catch (err) {
+    console.error('Error uploading logo:', err);
+    
+    // Show error status
+    statusEl.className = 'upload-status error';
+    statusEl.innerHTML = '<i class="fa fa-times"></i> Upload failed';
+
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      statusEl.innerHTML = '';
+      statusEl.className = 'upload-status';
+    }, 3000);
+
+    showAlert('error', err.message || 'Failed to upload logo. Please try again.');
+    
+    // Clear the file input
+    event.target.value = '';
+  }
+}
+
+/**
+ * Remove uploaded logo
+ */
+function removeLogo() {
+  // Clear the logo URL
+  logoUrl = null;
+
+  // Hide preview
+  const previewEl = document.getElementById('logoPreview');
+  previewEl.style.display = 'none';
+
+  // Clear the file input
+  const fileInput = document.getElementById('logoUpload');
+  fileInput.value = '';
+
+  // Clear status
+  const statusEl = document.getElementById('logoUploadStatus');
+  statusEl.innerHTML = '';
+  statusEl.className = 'upload-status';
+
+  showAlert('info', 'Logo removed');
 }
