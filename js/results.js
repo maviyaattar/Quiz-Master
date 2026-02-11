@@ -212,7 +212,11 @@ async function loadParticipants() {
     '<div class="loading-skeleton"></div><div class="loading-skeleton"></div><div class="loading-skeleton"></div>';
 
   try {
-    const response = await fetch(`${API}/api/quiz/leaderboard/${code}`);
+    const response = await fetch(`${API}/api/quiz/participants/${code}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to load participants");
@@ -299,7 +303,13 @@ async function loadLeaderboard() {
     }
 
     const data = await response.json();
-    allParticipants = data || [];
+    
+    // Map the data to include branch if available
+    allParticipants = data.map(participant => ({
+      ...participant,
+      branch: participant.branch || 'N/A'
+    }));
+    
     filteredParticipants = [...allParticipants];
     
     // Apply current search if any
@@ -468,7 +478,7 @@ async function downloadPDF(rollNo) {
     showAlert('success', 'PDF downloaded successfully!');
   } catch (err) {
     console.error('Error downloading PDF:', err);
-    showAlert('error', 'PDF download is not available yet. Backend endpoint needs to be implemented.');
+    showAlert('error', 'Failed to download PDF. Please try again.');
   }
 }
 
