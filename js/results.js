@@ -254,7 +254,7 @@ function renderParticipants() {
               <td>
                 <button 
                   class="pdf-btn" 
-                  onclick="downloadPDF('${escapeHtml(p.rollNo)}')"
+                  onclick="downloadPDF('${p.rollNo.replace(/'/g, "\\'")}')"
                   aria-label="Download PDF for ${escapeHtml(p.name)}"
                 >
                   <i class="fa fa-download"></i> PDF
@@ -420,12 +420,15 @@ async function loadSummary() {
  */
 async function downloadPDF(rollNo) {
   try {
+    // Sanitize rollNo to prevent injection
+    const sanitizedRollNo = sanitizeInput(rollNo);
+    
     showAlert('info', 'Generating PDF...');
     
     // Use the existing submit endpoint which generates PDFs
     // Note: The backend needs to implement the new endpoint for individual PDFs
     // For now, we'll show a message that this feature requires backend support
-    const url = `${API}/api/quiz/participant-pdf/${code}/${encodeURIComponent(rollNo)}`;
+    const url = `${API}/api/quiz/participant-pdf/${encodeURIComponent(code)}/${encodeURIComponent(sanitizedRollNo)}`;
     
     const response = await fetch(url, {
       headers: {
@@ -442,7 +445,7 @@ async function downloadPDF(rollNo) {
     const downloadUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = downloadUrl;
-    a.download = `quiz-result-${rollNo}.pdf`;
+    a.download = `quiz-result-${sanitizedRollNo}.pdf`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(downloadUrl);
