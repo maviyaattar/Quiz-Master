@@ -70,6 +70,62 @@
           max="480"
           aria-label="Test duration in minutes"
         />
+        
+        <!-- Organization Name (Optional) -->
+        <input
+          class="input"
+          id="orgName"
+          placeholder="Organization Name (Optional)"
+          type="text"
+          aria-label="Organization name (optional)"
+          maxlength="100"
+        />
+        
+        <!-- Logo Upload (Optional) -->
+        <div class="logo-upload-section">
+          <label for="logoUpload" class="logo-upload-label">
+            <i class="fa fa-image"></i> Upload Logo (Optional)
+          </label>
+          <input
+            type="file"
+            id="logoUpload"
+            accept="image/png,image/jpg,image/jpeg,image/svg+xml"
+            aria-label="Upload organization logo"
+            style="display: none;"
+            onchange="handleLogoUpload(event)"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="document.getElementById('logoUpload').click()"
+            aria-label="Choose logo file"
+          >
+            <i class="fa fa-upload"></i> Choose Logo
+          </button>
+          <div id="logoPreviewContainer" class="logo-preview-container" style="display: none;">
+            <img id="logoPreview" class="logo-preview" alt="Logo preview" />
+            <button
+              type="button"
+              class="btn-remove-logo"
+              onclick="removeLogo()"
+              aria-label="Remove logo"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Negative Marking Checkbox -->
+        <div class="checkbox-container">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              id="negativeMarking"
+              aria-label="Enable negative marking"
+            />
+            <span>Enable Negative Marking (-0.25 for wrong answers)</span>
+          </label>
+        </div>
       </div>
 
       <!-- ===== QUESTION BUILDER ===== -->
