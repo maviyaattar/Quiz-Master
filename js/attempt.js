@@ -84,6 +84,9 @@ const poll = setInterval(async () => {
       elements.waitScreen.classList.add("hide");
       elements.quizScreen.classList.remove("hide");
 
+      // Display branding if available
+      displayBranding(d);
+
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
       
@@ -98,6 +101,43 @@ const poll = setInterval(async () => {
     console.log('Waiting for quiz to start...');
   }
 }, 3000);
+
+/* ==========================================
+   DISPLAY BRANDING
+   ========================================== */
+function displayBranding(quizData) {
+  const brandingSection = document.getElementById('brandingSection');
+  const brandingLogo = document.getElementById('brandingLogo');
+  const brandingOrgName = document.getElementById('brandingOrgName');
+  const brandingQuizTitle = document.getElementById('brandingQuizTitle');
+
+  let hasContent = false;
+
+  // Display logo if available
+  if (quizData.logoUrl) {
+    brandingLogo.src = quizData.logoUrl;
+    brandingLogo.style.display = 'block';
+    hasContent = true;
+  }
+
+  // Display organization name if available
+  if (quizData.orgName) {
+    brandingOrgName.textContent = sanitizeText(quizData.orgName);
+    brandingOrgName.style.display = 'block';
+    hasContent = true;
+  }
+
+  // Display quiz title
+  if (quizData.title) {
+    brandingQuizTitle.textContent = sanitizeText(quizData.title);
+    hasContent = true;
+  }
+
+  // Show branding section if there's content to display
+  if (hasContent) {
+    brandingSection.style.display = 'block';
+  }
+}
 
 /* ==========================================
    TIMER FUNCTIONALITY
