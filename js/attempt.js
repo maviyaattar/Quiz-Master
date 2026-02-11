@@ -7,6 +7,10 @@ const API = "https://quiz-backend-production-4aaf.up.railway.app";
 const code = new URLSearchParams(location.search).get("code");
 const joiner = JSON.parse(localStorage.getItem("joiner"));
 
+// Animation timing constants
+const LOADING_ANIMATION_DURATION = 300; // milliseconds for fade out
+const SCREEN_TRANSITION_DELAY = 400; // milliseconds before showing thank you screen
+
 // Validate and redirect if missing data
 if (!code || !joiner) {
   location.href = "join.html";
@@ -106,7 +110,9 @@ const poll = setInterval(async () => {
    DISPLAY BRANDING
    ========================================== */
 function displayBranding(quizData) {
-  console.log('Quiz data received:', quizData); // Debug log
+  // Debug logging to diagnose branding display issues
+  // TODO: Remove or make conditional based on environment in production
+  console.log('Quiz data received:', quizData);
   
   const brandingSection = document.getElementById('brandingSection');
   const brandingLogo = document.getElementById('brandingLogo');
@@ -347,7 +353,7 @@ async function submit(isTimerTriggered = false) {
         elements.quizScreen.classList.add("hide");
         elements.thankScreen.classList.remove("hide");
         localStorage.removeItem("joiner");
-      }, 400);
+      }, SCREEN_TRANSITION_DELAY);
       return;
     }
 
@@ -374,7 +380,7 @@ async function submit(isTimerTriggered = false) {
       elements.quizScreen.classList.add("hide");
       elements.thankScreen.classList.remove("hide");
       localStorage.removeItem("joiner");
-    }, 400);
+    }, SCREEN_TRANSITION_DELAY);
   } catch (err) {
     console.error('Submit error:', err);
     
@@ -389,7 +395,7 @@ async function submit(isTimerTriggered = false) {
         elements.quizScreen.classList.add("hide");
         elements.thankScreen.classList.remove("hide");
         localStorage.removeItem("joiner");
-      }, 400);
+      }, SCREEN_TRANSITION_DELAY);
       return;
     }
     
@@ -726,12 +732,12 @@ function hideLoadingState() {
   const loadingOverlay = document.getElementById('loadingOverlay');
   if (loadingOverlay) {
     // Add fade out animation before removing
-    loadingOverlay.style.animation = 'fadeOut 0.3s ease-out';
+    loadingOverlay.style.animation = `fadeOut ${LOADING_ANIMATION_DURATION}ms ease-out`;
     setTimeout(() => {
       if (loadingOverlay && loadingOverlay.parentNode) {
         loadingOverlay.remove();
       }
-    }, 300);
+    }, LOADING_ANIMATION_DURATION);
   }
 }
 
