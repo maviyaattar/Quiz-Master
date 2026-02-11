@@ -440,38 +440,18 @@ async function resetQuiz() {
   );
 }
 
-/* ===== TAB SWITCHING ===== */
+/* ===== SHOW RESULTS ===== */
 /**
- * Switch between tabs
- * @param {string} tabName - Name of tab to show
- * @param {HTMLElement} btn - Button element clicked
+ * Navigate to the results page
  */
-function switchTab(tabName, btn) {
-  // Remove active class from all tabs and buttons
-  document
-    .querySelectorAll(".tab-content")
-    .forEach((t) => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-
-  // Add active class to selected tab and button
-  document.getElementById(tabName).classList.add("active");
-  btn.classList.add("active");
-
-  // Load content based on tab
-  if (tabName === "participants") {
-    loadParticipants();
-  } else if (tabName === "leaderboard") {
-    loadLeaderboard();
-  } else if (tabName === "summary") {
-    loadSummary();
-  }
+function showResults() {
+  location.href = `results.html?code=${encodeURIComponent(code)}`;
 }
 
 /* ===== INITIALIZATION ===== */
 document.addEventListener("DOMContentLoaded", () => {
-  // Load quiz and initial tab
+  // Load quiz details
   loadQuiz();
-  loadParticipants(); // Default tab
 
   // Add animation styles
   addAnimationStyles();
