@@ -366,13 +366,18 @@ async function resetQuiz() {
         }
 
         // Get the new quiz code
-        let newQuiz = { code: null };
+        let newQuiz;
         try {
           newQuiz = await createResponse.json();
         } catch (e) {
           console.error("Could not parse success response:", e);
           throw new Error("Failed to confirm quiz creation. Please check dashboard.");
         }
+        
+        if (!newQuiz || !newQuiz.code) {
+          throw new Error("Quiz created but code is missing. Please check dashboard.");
+        }
+        
         showNotification("Quiz cloned successfully! Redirecting...", "success");
 
         // Redirect to the new quiz
