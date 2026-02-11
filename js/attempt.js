@@ -29,6 +29,7 @@ let index = 0;
 let endTime = null;
 let timerInt = null;
 let warnings = 0;
+let quizInfo = { title: "", orgName: "", logoUrl: "" };
 
 // PERFORMANCE: Cache frequently accessed DOM elements to avoid repeated lookups
 let cachedElements = null;
@@ -75,6 +76,13 @@ const poll = setInterval(async () => {
       // Subtract 20 seconds from backend endTime to create buffer
       // Display shows 20 seconds less than actual time
       endTime = new Date(new Date(d.endTime).getTime() - 20000);
+      
+      // Store quiz info
+      quizInfo = {
+        title: d.title || "",
+        orgName: d.orgName || "",
+        logoUrl: d.logoUrl || ""
+      };
 
       // PERFORMANCE: Cache DOM elements before starting quiz
       cacheElements();
@@ -83,6 +91,9 @@ const poll = setInterval(async () => {
       const elements = cacheElements();
       elements.waitScreen.classList.add("hide");
       elements.quizScreen.classList.remove("hide");
+      
+      // Display quiz info header
+      displayQuizInfoHeader();
 
       // Setup anti-cheat mechanisms when quiz starts
       setupAntiCheat();
@@ -693,6 +704,42 @@ function setupAntiCheat() {
   
   // Prevent text copying
   document.oncopy = (e) => e.preventDefault();
+}
+
+/* ==========================================
+   DISPLAY QUIZ INFO HEADER
+   ========================================== */
+function displayQuizInfoHeader() {
+  const header = document.getElementById('quizInfoHeader');
+  const logo = document.getElementById('quizLogo');
+  const orgName = document.getElementById('quizOrgName');
+  const title = document.getElementById('quizTitle');
+  
+  // Show header if we have any quiz info
+  if (quizInfo.title || quizInfo.orgName || quizInfo.logoUrl) {
+    header.style.display = 'block';
+  }
+  
+  // Display logo if provided
+  if (quizInfo.logoUrl) {
+    logo.src = quizInfo.logoUrl;
+    logo.style.display = 'block';
+    // Handle logo load error gracefully
+    logo.onerror = () => {
+      logo.style.display = 'none';
+    };
+  }
+  
+  // Display organization name if provided
+  if (quizInfo.orgName) {
+    orgName.textContent = sanitizeText(quizInfo.orgName);
+    orgName.style.display = 'block';
+  }
+  
+  // Display quiz title
+  if (quizInfo.title) {
+    title.textContent = sanitizeText(quizInfo.title);
+  }
 }
 
 /* ==========================================
