@@ -106,15 +106,23 @@ const poll = setInterval(async () => {
    DISPLAY BRANDING
    ========================================== */
 function displayBranding(quizData) {
+  console.log('Quiz data received:', quizData); // Debug log
+  
   const brandingSection = document.getElementById('brandingSection');
   const brandingLogo = document.getElementById('brandingLogo');
   const brandingOrgName = document.getElementById('brandingOrgName');
   const brandingQuizTitle = document.getElementById('brandingQuizTitle');
 
+  if (!brandingSection || !brandingLogo || !brandingOrgName || !brandingQuizTitle) {
+    console.error('Branding elements not found in DOM');
+    return;
+  }
+
   let hasContent = false;
 
   // Display logo if available
   if (quizData.logoUrl) {
+    console.log('Setting logo URL:', quizData.logoUrl);
     brandingLogo.src = quizData.logoUrl;
     brandingLogo.style.display = 'block';
     hasContent = true;
@@ -122,6 +130,7 @@ function displayBranding(quizData) {
 
   // Display organization name if available
   if (quizData.orgName) {
+    console.log('Setting org name:', quizData.orgName);
     brandingOrgName.textContent = sanitizeText(quizData.orgName);
     brandingOrgName.style.display = 'block';
     hasContent = true;
@@ -129,13 +138,17 @@ function displayBranding(quizData) {
 
   // Display quiz title
   if (quizData.title) {
+    console.log('Setting quiz title:', quizData.title);
     brandingQuizTitle.textContent = sanitizeText(quizData.title);
     hasContent = true;
   }
 
   // Show branding section if there's content to display
   if (hasContent) {
+    console.log('Showing branding section');
     brandingSection.style.display = 'block';
+  } else {
+    console.log('No branding content to display');
   }
 }
 
@@ -328,10 +341,13 @@ async function submit(isTimerTriggered = false) {
     // Backend has received the attempt regardless of response status
     if (isTimerTriggered) {
       console.log('Timer expired - quiz attempt recorded');
-      const elements = cacheElements();
-      elements.quizScreen.classList.add("hide");
-      elements.thankScreen.classList.remove("hide");
-      localStorage.removeItem("joiner");
+      // Wait for loading overlay to fade out before showing thank you
+      setTimeout(() => {
+        const elements = cacheElements();
+        elements.quizScreen.classList.add("hide");
+        elements.thankScreen.classList.remove("hide");
+        localStorage.removeItem("joiner");
+      }, 400);
       return;
     }
 
@@ -352,11 +368,13 @@ async function submit(isTimerTriggered = false) {
     // Submission successful - show thank you screen
     console.log('Quiz submitted successfully:', result);
     
-    // Use cached elements
-    const elements = cacheElements();
-    elements.quizScreen.classList.add("hide");
-    elements.thankScreen.classList.remove("hide");
-    localStorage.removeItem("joiner");
+    // Wait for loading overlay to fade out before showing thank you
+    setTimeout(() => {
+      const elements = cacheElements();
+      elements.quizScreen.classList.add("hide");
+      elements.thankScreen.classList.remove("hide");
+      localStorage.removeItem("joiner");
+    }, 400);
   } catch (err) {
     console.error('Submit error:', err);
     
@@ -365,10 +383,13 @@ async function submit(isTimerTriggered = false) {
     if (isTimerTriggered) {
       console.log('Timer expired - showing completion screen despite error');
       hideLoadingState();
-      const elements = cacheElements();
-      elements.quizScreen.classList.add("hide");
-      elements.thankScreen.classList.remove("hide");
-      localStorage.removeItem("joiner");
+      // Wait for loading overlay to fade out
+      setTimeout(() => {
+        const elements = cacheElements();
+        elements.quizScreen.classList.add("hide");
+        elements.thankScreen.classList.remove("hide");
+        localStorage.removeItem("joiner");
+      }, 400);
       return;
     }
     
@@ -704,7 +725,13 @@ function showLoadingState() {
 function hideLoadingState() {
   const loadingOverlay = document.getElementById('loadingOverlay');
   if (loadingOverlay) {
-    loadingOverlay.remove();
+    // Add fade out animation before removing
+    loadingOverlay.style.animation = 'fadeOut 0.3s ease-out';
+    setTimeout(() => {
+      if (loadingOverlay && loadingOverlay.parentNode) {
+        loadingOverlay.remove();
+      }
+    }, 300);
   }
 }
 

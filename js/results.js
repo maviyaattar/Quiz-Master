@@ -162,7 +162,7 @@ function renderParticipants(participants) {
  */
 function downloadPDF(name, rollNo, score) {
   showNotification(
-    "Note: Individual PDF downloads are not yet available. PDFs were generated and downloaded when participants submitted their quiz.",
+    "✅ PDF Report: The participant's result PDF was automatically generated and downloaded when they submitted their quiz. Individual PDF downloads from this page are not currently available.",
     "info"
   );
 }
