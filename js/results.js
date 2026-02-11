@@ -453,11 +453,9 @@ async function downloadPDF(rollNo) {
     // Sanitize rollNo to prevent injection
     const sanitizedRollNo = sanitizeInput(rollNo);
     
+    // Show loading alert
     showAlert('info', 'Generating PDF...');
     
-    // Use the existing submit endpoint which generates PDFs
-    // Note: The backend needs to implement the new endpoint for individual PDFs
-    // For now, we'll show a message that this feature requires backend support
     const url = `${API}/api/quiz/participant-pdf/${encodeURIComponent(code)}/${encodeURIComponent(sanitizedRollNo)}`;
     
     const response = await fetch(url, {
@@ -466,25 +464,46 @@ async function downloadPDF(rollNo) {
       },
     });
     
+    // Check response status first
     if (!response.ok) {
-      throw new Error('PDF generation failed');
+      // Try to get error message
+      let errorMsg = 'Failed to generate PDF';
+      try {
+        const result = await response.json();
+        errorMsg = result?.msg || errorMsg;
+      } catch (e) {
+        console.log('Could not parse error response');
+      }
+      throw new Error(errorMsg);
     }
     
-    // Download the PDF
+    // Get the blob and download it
     const blob = await response.blob();
+    
+    // Create download link
     const downloadUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = `quiz-result-${sanitizedRollNo}.pdf`;
+    a.style.display = 'none';
     document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(downloadUrl);
-    document.body.removeChild(a);
     
+    // Trigger download
+    a.click();
+    
+    // Cleanup
+    setTimeout(() => {
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
+    }, 100);
+    
+    // Show success message
     showAlert('success', 'PDF downloaded successfully!');
+    
   } catch (err) {
     console.error('Error downloading PDF:', err);
-    showAlert('error', 'Failed to download PDF. Please try again.');
+    const errorMsg = err.message || 'Failed to download PDF. Please try again.';
+    showAlert('error', errorMsg);
   }
 }
 
@@ -580,10 +599,15 @@ function showAlert(type, message) {
 
   alertContainer.appendChild(alert);
 
+  // Auto-remove after delay - info messages shorter
   setTimeout(() => {
     alert.style.animation = 'slideOutRight 0.3s ease-out';
-    setTimeout(() => alert.remove(), 300);
-  }, 4000);
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.remove();
+      }
+    }, 300);
+  }, type === 'info' ? 2000 : 4000);
 }
 
 /* ===== INITIALIZATION ===== */
