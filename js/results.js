@@ -202,6 +202,18 @@ function renderCurrentTab() {
   // Summary tab doesn't use filtering
 }
 
+/**
+ * Transform participant data to ensure consistent branch field
+ * @param {Array} data - Raw participant data from API
+ * @returns {Array} Transformed participant data with branch field
+ */
+function transformParticipantData(data) {
+  return (data || []).map(participant => ({
+    ...participant,
+    branch: participant.branch || 'N/A'
+  }));
+}
+
 /* ===== PARTICIPANTS TAB ===== */
 /**
  * Load participants list
@@ -212,14 +224,18 @@ async function loadParticipants() {
     '<div class="loading-skeleton"></div><div class="loading-skeleton"></div><div class="loading-skeleton"></div>';
 
   try {
-    const response = await fetch(`${API}/api/quiz/leaderboard/${code}`);
+    const response = await fetch(`${API}/api/quiz/participants/${code}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to load participants");
     }
 
     const data = await response.json();
-    allParticipants = data || [];
+    allParticipants = transformParticipantData(data);
     filteredParticipants = [...allParticipants];
     
     // Apply current search if any
@@ -299,7 +315,7 @@ async function loadLeaderboard() {
     }
 
     const data = await response.json();
-    allParticipants = data || [];
+    allParticipants = transformParticipantData(data);
     filteredParticipants = [...allParticipants];
     
     // Apply current search if any
@@ -468,7 +484,7 @@ async function downloadPDF(rollNo) {
     showAlert('success', 'PDF downloaded successfully!');
   } catch (err) {
     console.error('Error downloading PDF:', err);
-    showAlert('error', 'PDF download is not available yet. Backend endpoint needs to be implemented.');
+    showAlert('error', 'Failed to download PDF. Please try again.');
   }
 }
 
