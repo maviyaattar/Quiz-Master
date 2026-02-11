@@ -71,10 +71,10 @@ async function loadQuizInfo() {
 
     const q = await response.json();
 
-    // Update title and description
-    document.getElementById("quizTitle").innerText = sanitizeInput(q.title);
-    document.getElementById("quizDesc").innerText = sanitizeInput(q.description);
-    document.getElementById("pageTitle").innerText = `${sanitizeInput(q.title)} - Results`;
+    // Update title and description using textContent for safe rendering
+    document.getElementById("quizTitle").textContent = q.title;
+    document.getElementById("quizDesc").textContent = q.description;
+    document.getElementById("pageTitle").textContent = `${q.title} - Results`;
   } catch (err) {
     console.error("Error loading quiz info:", err);
     showNotification("Failed to load quiz information", "error");
@@ -134,38 +134,48 @@ function renderParticipantsTable() {
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        ${filteredParticipants
-          .map((p) => {
-            const submittedDate = new Date(p.submittedAt);
-            const formattedDate = submittedDate.toLocaleDateString();
-            const formattedTime = submittedDate.toLocaleTimeString();
-            
-            return `
-              <tr class="participant-row">
-                <td><strong>${escapeHtml(p.name)}</strong></td>
-                <td>${escapeHtml(p.rollNo)}</td>
-                <td>${escapeHtml(p.branch || 'N/A')}</td>
-                <td><span class="score-badge">${p.score} pts</span></td>
-                <td><small>${formattedDate} ${formattedTime}</small></td>
-                <td>
-                  <button 
-                    class="btn-download" 
-                    onclick="downloadParticipantPDF('${escapeHtml(p.rollNo)}')"
-                    aria-label="Download PDF for ${escapeHtml(p.name)}"
-                  >
-                    <i class="fa fa-download"></i> PDF
-                  </button>
-                </td>
-              </tr>
-            `;
-          })
-          .join("")}
+      <tbody id="participantsTableBody">
       </tbody>
     </table>
   `;
 
   container.innerHTML = tableHTML;
+  
+  const tbody = document.getElementById("participantsTableBody");
+  
+  filteredParticipants.forEach((p) => {
+    const submittedDate = new Date(p.submittedAt);
+    const formattedDate = submittedDate.toLocaleDateString();
+    const formattedTime = submittedDate.toLocaleTimeString();
+    
+    const row = document.createElement('tr');
+    row.className = 'participant-row';
+    
+    row.innerHTML = `
+      <td><strong>${escapeHtml(p.name)}</strong></td>
+      <td>${escapeHtml(p.rollNo)}</td>
+      <td>${escapeHtml(p.branch || 'N/A')}</td>
+      <td><span class="score-badge">${p.score} pts</span></td>
+      <td><small>${formattedDate} ${formattedTime}</small></td>
+      <td>
+        <button 
+          class="btn-download" 
+          data-rollno="${escapeHtml(p.rollNo)}"
+          aria-label="Download PDF for ${escapeHtml(p.name)}"
+        >
+          <i class="fa fa-download"></i> PDF
+        </button>
+      </td>
+    `;
+    
+    // Add click event listener for PDF download
+    const downloadBtn = row.querySelector('.btn-download');
+    downloadBtn.addEventListener('click', () => {
+      downloadParticipantPDF(p.rollNo);
+    });
+    
+    tbody.appendChild(row);
+  });
 }
 
 /**
@@ -391,7 +401,7 @@ function showNotification(message, type = "info") {
     animation: slideInRight 0.3s ease-out;
   `;
 
-  notification.innerHTML = escapeHtml(message);
+  notification.textContent = message;
   container.appendChild(notification);
 
   // Auto-remove after 3 seconds

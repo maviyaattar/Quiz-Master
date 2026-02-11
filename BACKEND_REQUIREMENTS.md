@@ -94,4 +94,5 @@ The Quiz model should include:
 - All endpoints should maintain backward compatibility
 - Handle missing logo URLs gracefully
 - Ensure PDF generation works even if logo URL is broken
-- Validate file types for logo upload (png, jpg, jpeg, svg)
+- Validate file types for logo upload (png, jpg, jpeg)
+  - Note: SVG files are excluded to prevent potential script injection attacks

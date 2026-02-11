@@ -274,10 +274,16 @@ async function createTest() {
       description,
       duration: durationMin * 60 + 20, // Convert minutes to seconds and add 20 second buffer
       questions,
-      orgName: orgName || undefined,
-      logoUrl: logoUrl || undefined,
-      negativeMarking,
+      negativeMarking, // Always included to explicitly set the value
     };
+    
+    // Add optional fields only if they have values
+    if (orgName) {
+      payload.orgName = orgName;
+    }
+    if (logoUrl) {
+      payload.logoUrl = logoUrl;
+    }
 
     const response = await fetch(`${API_BASE}/api/quiz/create`, {
       method: "POST",
@@ -550,10 +556,10 @@ async function handleLogoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  // Validate file type
-  const validTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml'];
+  // Validate file type (Note: SVG files excluded for security reasons)
+  const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
   if (!validTypes.includes(file.type)) {
-    showAlert("error", "Please upload a valid image file (PNG, JPG, JPEG, SVG)");
+    showAlert("error", "Please upload a valid image file (PNG, JPG, JPEG)");
     event.target.value = '';
     return;
   }
