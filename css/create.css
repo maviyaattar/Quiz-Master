@@ -369,21 +369,30 @@ textarea.input {
 
 .question-actions i {
   cursor: pointer;
-  color: var(--muted);
-  padding: 6px 8px;
-  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
   transition: var(--transition);
-  font-size: 14px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e5e7eb;
 }
 
 .question-actions i:hover {
   color: var(--primary);
-  background: var(--bg);
+  background: rgba(91, 108, 255, 0.1);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.question-actions i.delete {
+  color: var(--text);
 }
 
 .question-actions i.delete:hover {
-  color: var(--danger);
-  background: rgba(239, 68, 68, 0.1);
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
 }
 
 .correct {
