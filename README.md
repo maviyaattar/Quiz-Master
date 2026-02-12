@@ -89,18 +89,7 @@ Simple interface for students to join quizzes.
    php -S localhost:8080
    ```
 
-3. **Configure AI Features (Required for AI-powered quiz generation)**
-   ```bash
-   # Copy the example config file
-   cp js/config.example.js js/config.js
-   
-   # Edit js/config.js and add your Groq API key
-   # Get your API key from: https://console.groq.com/
-   ```
-   
-   **Important:** Never commit `js/config.js` to the repository. It's already in `.gitignore`.
-
-4. **Open in browser**
+3. **Open in browser**
    ```
    http://localhost:8080
    ```
