@@ -24,8 +24,14 @@ let aiEditIndex = null;
 let aiLogoUrl = null; // Store uploaded logo URL for AI mode
 
 /* ===== GROQ AI CONFIGURATION ===== */
-const GROQ_API_KEY = "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";
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+// API configuration is loaded from config.js (not committed to repository)
+// If config is not loaded, show error to user
+if (typeof CONFIG === 'undefined') {
+  console.error('Configuration not loaded! Please ensure config.js exists.');
+  console.error('Copy config.example.js to config.js and add your API key.');
+}
+const GROQ_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_API_KEY : '';
+const GROQ_URL = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_URL : 'https://api.groq.com/openai/v1/chat/completions';
 
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
@@ -743,6 +749,12 @@ async function generateWithAI() {
     return;
   }
   
+  // Check if API key is configured
+  if (!GROQ_API_KEY || GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE' || GROQ_API_KEY === '') {
+    showAlert('error', 'Groq API key is not configured. Please set up your config.js file. See config.example.js for instructions.');
+    return;
+  }
+  
   // Show loading state
   const generateBtn = document.getElementById('generateBtn');
   const originalText = generateBtn.innerHTML;
@@ -776,7 +788,7 @@ Requirements:
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MODEL : 'mixtral-8x7b-32768',
         messages: [
           {
             role: 'system',
@@ -787,8 +799,8 @@ Requirements:
             content: prompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 4000
+        temperature: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_TEMPERATURE : 0.7,
+        max_tokens: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MAX_TOKENS : 4000
       })
     });
     
