@@ -19,10 +19,13 @@
 
 ### For Quiz Creators
 - 📝 **Easy Quiz Creation** - Intuitive interface for creating multiple-choice quizzes
+- 🤖 **AI-Powered Generation** - Automatically generate questions using Groq AI (Mixtral model)
 - 🎯 **Question Management** - Add, edit, and delete questions with ease
 - 🔴 **Live Quiz Control** - Start, monitor, and end quizzes in real-time
 - 📊 **Analytics Dashboard** - View participant scores and performance metrics
 - 🔗 **Shareable Quiz Codes** - Generate unique codes for quiz access
+- 🎨 **Logo & Branding** - Add organization logo and name to quizzes
+- ➖ **Negative Marking** - Optional penalty for incorrect answers
 
 ### For Quiz Takers
 - 🚀 **Quick Join** - Join quizzes instantly with a quiz code
@@ -86,7 +89,18 @@ Simple interface for students to join quizzes.
    php -S localhost:8080
    ```
 
-3. **Open in browser**
+3. **Configure AI Features (Required for AI-powered quiz generation)**
+   ```bash
+   # Copy the example config file
+   cp js/config.example.js js/config.js
+   
+   # Edit js/config.js and add your Groq API key
+   # Get your API key from: https://console.groq.com/
+   ```
+   
+   **Important:** Never commit `js/config.js` to the repository. It's already in `.gitignore`.
+
+4. **Open in browser**
    ```
    http://localhost:8080
    ```
@@ -103,6 +117,21 @@ Simple interface for students to join quizzes.
 4. **Start Quiz** - Generate a unique quiz code and start the quiz
 5. **Monitor** - Track participants and view real-time leaderboard
 6. **View Results** - Check scores and performance metrics
+
+### Using AI-Powered Quiz Generation
+
+1. **Enable AI Mode** - In the quiz creation page, click the "AI-Based" tab
+2. **Configure Settings**:
+   - Enter test title and description
+   - Select difficulty level (Easy/Medium/Hard)
+   - Set number of questions (1-50)
+   - Enter topic or prompt (e.g., "Python data structures")
+3. **Generate** - Click "Generate Questions" and wait for AI to create questions
+4. **Review & Edit** - Review generated questions, edit or delete as needed
+5. **Add More** - Optionally add manual questions alongside AI-generated ones
+6. **Create Test** - Submit the quiz with your customized question set
+
+**Note:** AI features require a valid Groq API key configured in `js/config.js`. See [Quick Start](#quick-start) for setup instructions.
 
 ### For Quiz Takers
 

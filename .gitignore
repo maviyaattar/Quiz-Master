@@ -23,3 +23,7 @@ node_modules/
 # Build artifacts
 dist/
 build/
+
+# Configuration files with sensitive data
+js/config.js
+config.js

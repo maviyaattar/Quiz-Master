@@ -18,6 +18,20 @@ let questions = [];
 let editIndex = null;
 let isSubmitting = false;
 let logoUrl = null; // Store uploaded logo URL
+let currentMode = 'manual'; // Track current mode: 'manual' or 'ai'
+let aiQuestions = [];
+let aiEditIndex = null;
+let aiLogoUrl = null; // Store uploaded logo URL for AI mode
+
+/* ===== GROQ AI CONFIGURATION ===== */
+// API configuration is loaded from config.js (not committed to repository)
+// If config is not loaded, show error to user
+if (typeof CONFIG === 'undefined') {
+  console.error('Configuration not loaded! Please ensure config.js exists.');
+  console.error('Copy config.example.js to config.js and add your API key.');
+}
+const GROQ_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_API_KEY : '';
+const GROQ_URL = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_URL : 'https://api.groq.com/openai/v1/chat/completions';
 
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
@@ -544,8 +558,9 @@ function showConfirmDialog(message, onConfirm) {
 /**
  * Handle logo file upload
  * @param {Event} event - File input change event
+ * @param {string} mode - 'manual' or 'ai'
  */
-async function handleLogoUpload(event) {
+async function handleLogoUpload(event, mode = 'manual') {
   const file = event.target.files[0];
   
   if (!file) {
@@ -567,8 +582,13 @@ async function handleLogoUpload(event) {
     return;
   }
 
+  // Determine element IDs based on mode
+  const statusId = mode === 'ai' ? 'aiLogoUploadStatus' : 'logoUploadStatus';
+  const previewId = mode === 'ai' ? 'aiLogoPreview' : 'logoPreview';
+  const previewImgId = mode === 'ai' ? 'aiLogoPreviewImage' : 'logoPreviewImage';
+
   // Show uploading status
-  const statusEl = document.getElementById('logoUploadStatus');
+  const statusEl = document.getElementById(statusId);
   statusEl.className = 'upload-status uploading';
   statusEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading logo...';
 
@@ -593,12 +613,16 @@ async function handleLogoUpload(event) {
     }
 
     // Store the logo URL
-    logoUrl = data.url;
+    if (mode === 'ai') {
+      aiLogoUrl = data.url;
+    } else {
+      logoUrl = data.url;
+    }
 
     // Show preview
-    const previewEl = document.getElementById('logoPreview');
-    const previewImg = document.getElementById('logoPreviewImage');
-    previewImg.src = logoUrl;
+    const previewEl = document.getElementById(previewId);
+    const previewImg = document.getElementById(previewImgId);
+    previewImg.src = data.url;
     previewEl.style.display = 'inline-block';
 
     // Show success status
@@ -634,23 +658,468 @@ async function handleLogoUpload(event) {
 
 /**
  * Remove uploaded logo
+ * @param {string} mode - 'manual' or 'ai'
  */
-function removeLogo() {
+function removeLogo(mode = 'manual') {
+  // Determine element IDs based on mode
+  const previewId = mode === 'ai' ? 'aiLogoPreview' : 'logoPreview';
+  const fileInputId = mode === 'ai' ? 'aiLogoUpload' : 'logoUpload';
+  const statusId = mode === 'ai' ? 'aiLogoUploadStatus' : 'logoUploadStatus';
+
   // Clear the logo URL
-  logoUrl = null;
+  if (mode === 'ai') {
+    aiLogoUrl = null;
+  } else {
+    logoUrl = null;
+  }
 
   // Hide preview
-  const previewEl = document.getElementById('logoPreview');
+  const previewEl = document.getElementById(previewId);
   previewEl.style.display = 'none';
 
   // Clear the file input
-  const fileInput = document.getElementById('logoUpload');
+  const fileInput = document.getElementById(fileInputId);
   fileInput.value = '';
 
   // Clear status
-  const statusEl = document.getElementById('logoUploadStatus');
+  const statusEl = document.getElementById(statusId);
   statusEl.innerHTML = '';
   statusEl.className = 'upload-status';
 
   showAlert('info', 'Logo removed');
+}
+
+/* ===== MODE SWITCHING ===== */
+/**
+ * Switch between manual and AI modes
+ * @param {string} mode - 'manual' or 'ai'
+ */
+function switchMode(mode) {
+  currentMode = mode;
+  
+  // Update button states
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.mode === mode) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update section visibility
+  const manualSection = document.getElementById('manualMode');
+  const aiSection = document.getElementById('aiMode');
+  
+  if (mode === 'manual') {
+    manualSection.classList.add('active');
+    aiSection.classList.remove('active');
+  } else {
+    manualSection.classList.remove('active');
+    aiSection.classList.add('active');
+  }
+}
+
+/* ===== AI QUESTION GENERATION ===== */
+/**
+ * Generate questions using Groq AI
+ */
+async function generateWithAI() {
+  const titleInput = document.getElementById('aiTestTitle');
+  const difficultyInput = document.getElementById('difficultyLevel');
+  const numQuestionsInput = document.getElementById('numQuestions');
+  const topicInput = document.getElementById('topicPrompt');
+  
+  const title = sanitizeInput(titleInput.value.trim());
+  const difficulty = difficultyInput.value;
+  const numQuestions = Number(numQuestionsInput.value);
+  const topic = sanitizeInput(topicInput.value.trim());
+  
+  // Validation
+  if (!title) {
+    showAlert('error', 'Please enter test title');
+    return;
+  }
+  
+  if (!topic) {
+    showAlert('error', 'Please enter a topic or prompt for AI generation');
+    return;
+  }
+  
+  if (!numQuestions || numQuestions < 1 || numQuestions > 50) {
+    showAlert('error', 'Please enter a valid number of questions (1-50)');
+    return;
+  }
+  
+  // Check if API key is configured
+  if (!GROQ_API_KEY || GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE' || GROQ_API_KEY === '') {
+    showAlert('error', 'Groq API key is not configured. Please set up your config.js file. See config.example.js for instructions.');
+    return;
+  }
+  
+  // Show loading state
+  const generateBtn = document.getElementById('generateBtn');
+  const originalText = generateBtn.innerHTML;
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating questions with AI...';
+  
+  try {
+    // Prepare AI prompt
+    const prompt = `Generate ${numQuestions} ${difficulty} difficulty multiple-choice questions about: ${topic}. 
+
+Return ONLY a JSON array in this exact format:
+[
+  {
+    "text": "Question text here?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctIndex": 0
+  }
+]
+
+Requirements:
+- Exactly 4 options per question
+- correctIndex is 0-3 (index of correct answer)
+- Questions should be clear and unambiguous
+- Return ONLY the JSON array, no other text`;
+
+    // Call Groq AI API
+    const response = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MODEL : 'mixtral-8x7b-32768',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a quiz question generator. Generate multiple-choice questions in valid JSON format.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_TEMPERATURE : 0.7,
+        max_tokens: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MAX_TOKENS : 4000
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Extract and parse questions
+    const content = data.choices[0].message.content.trim();
+    
+    // Try to extract JSON array from content
+    let jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      throw new Error('Failed to extract valid JSON from AI response');
+    }
+    
+    const generatedQuestions = JSON.parse(jsonMatch[0]);
+    
+    // Validate questions
+    if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
+      throw new Error('No questions were generated');
+    }
+    
+    // Validate question structure
+    for (const q of generatedQuestions) {
+      if (!q.text || !Array.isArray(q.options) || q.options.length !== 4 || 
+          typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
+        throw new Error('Invalid question format received from AI');
+      }
+    }
+    
+    // Store generated questions
+    aiQuestions = generatedQuestions;
+    
+    // Show questions
+    renderAIQuestions();
+    
+    // Show question list card and manual add card
+    document.getElementById('aiQuestionsCard').style.display = 'block';
+    document.getElementById('aiManualQuestionCard').style.display = 'block';
+    document.getElementById('aiCreateAction').style.display = 'block';
+    
+    showAlert('success', `🎉 Successfully generated ${generatedQuestions.length} questions!`);
+    
+    // Scroll to questions
+    document.getElementById('aiQuestionsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+  } catch (err) {
+    console.error('Error generating questions:', err);
+    let errorMsg = 'Failed to generate questions. ';
+    
+    if (err.message.includes('API request failed')) {
+      errorMsg += 'API service error. Please try again later.';
+    } else if (err.message.includes('JSON')) {
+      errorMsg += 'Invalid response format. Please try again.';
+    } else {
+      errorMsg += err.message || 'Please try again.';
+    }
+    
+    showAlert('error', errorMsg);
+  } finally {
+    // Restore button
+    generateBtn.disabled = false;
+    generateBtn.innerHTML = originalText;
+  }
+}
+
+/**
+ * Render AI-generated questions
+ */
+function renderAIQuestions() {
+  const listContainer = document.getElementById('aiQuestionList');
+  
+  if (aiQuestions.length === 0) {
+    listContainer.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">No questions generated yet</p>';
+    return;
+  }
+  
+  listContainer.innerHTML = aiQuestions
+    .map((q, i) => {
+      const correctLabel = String.fromCharCode(65 + q.correctIndex);
+      return `
+        <div class="ai-question-item" role="article" aria-label="Question ${i + 1}">
+          <div class="question-header">
+            <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
+            <div class="question-actions">
+              <i class="fa fa-pen" onclick="editAIQuestion(${i})" 
+                 role="button" tabindex="0" aria-label="Edit question ${i + 1}"
+                 title="Edit question"></i>
+              <i class="fa fa-trash delete" onclick="deleteAIQuestion(${i})" 
+                 role="button" tabindex="0" aria-label="Delete question ${i + 1}"
+                 title="Delete question"></i>
+            </div>
+          </div>
+          <div class="ai-question-options">
+            ${q.options.map((opt, idx) => `
+              <div class="ai-question-option ${idx === q.correctIndex ? 'correct' : ''}">
+                ${String.fromCharCode(65 + idx)}. ${escapeHtml(opt)}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+/**
+ * Edit an AI-generated question
+ * @param {number} index - Index of question to edit
+ */
+function editAIQuestion(index) {
+  const q = aiQuestions[index];
+  const textInput = document.getElementById('aiQuestionText');
+  const opt0Input = document.getElementById('aiOpt0');
+  const opt1Input = document.getElementById('aiOpt1');
+  const opt2Input = document.getElementById('aiOpt2');
+  const opt3Input = document.getElementById('aiOpt3');
+  
+  textInput.value = q.text;
+  opt0Input.value = q.options[0];
+  opt1Input.value = q.options[1];
+  opt2Input.value = q.options[2];
+  opt3Input.value = q.options[3];
+  
+  document.querySelector(`input[name='aiCorrect'][value='${q.correctIndex}']`).checked = true;
+  
+  aiEditIndex = index;
+  
+  // Scroll to form
+  textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  textInput.focus();
+  
+  showAlert('info', `Editing Question ${index + 1}`);
+}
+
+/**
+ * Delete an AI-generated question
+ * @param {number} index - Index of question to delete
+ */
+function deleteAIQuestion(index) {
+  showConfirmDialog(
+    'Are you sure you want to delete this question?',
+    () => {
+      aiQuestions.splice(index, 1);
+      if (aiEditIndex === index) {
+        aiEditIndex = null;
+        clearAIForm();
+      }
+      renderAIQuestions();
+      showAlert('success', 'Question deleted!');
+      
+      // Hide create button if no questions left
+      if (aiQuestions.length === 0) {
+        document.getElementById('aiCreateAction').style.display = 'none';
+      }
+    }
+  );
+}
+
+/**
+ * Save a manually added question in AI mode
+ */
+function saveAIQuestion() {
+  const textInput = document.getElementById('aiQuestionText');
+  const opt0Input = document.getElementById('aiOpt0');
+  const opt1Input = document.getElementById('aiOpt1');
+  const opt2Input = document.getElementById('aiOpt2');
+  const opt3Input = document.getElementById('aiOpt3');
+  
+  const text = sanitizeInput(textInput.value.trim());
+  const options = [
+    sanitizeInput(opt0Input.value.trim()),
+    sanitizeInput(opt1Input.value.trim()),
+    sanitizeInput(opt2Input.value.trim()),
+    sanitizeInput(opt3Input.value.trim()),
+  ];
+  const correctRadio = document.querySelector("input[name='aiCorrect']:checked");
+  
+  // Validation
+  if (!text) {
+    showAlert('error', 'Please enter the question');
+    return;
+  }
+  
+  if (options.some(o => !o)) {
+    showAlert('error', 'Please fill all options');
+    return;
+  }
+  
+  if (!correctRadio) {
+    showAlert('error', 'Please select the correct option');
+    return;
+  }
+  
+  const question = {
+    text,
+    options,
+    correctIndex: Number(correctRadio.value),
+  };
+  
+  // Update or add question
+  if (aiEditIndex !== null) {
+    aiQuestions[aiEditIndex] = question;
+    aiEditIndex = null;
+    showAlert('success', 'Question updated!');
+  } else {
+    aiQuestions.push(question);
+    showAlert('success', 'Question added!');
+  }
+  
+  clearAIForm();
+  renderAIQuestions();
+  
+  // Show create button
+  document.getElementById('aiCreateAction').style.display = 'block';
+}
+
+/**
+ * Clear AI question form
+ */
+function clearAIForm() {
+  const textInput = document.getElementById('aiQuestionText');
+  const opt0Input = document.getElementById('aiOpt0');
+  const opt1Input = document.getElementById('aiOpt1');
+  const opt2Input = document.getElementById('aiOpt2');
+  const opt3Input = document.getElementById('aiOpt3');
+  
+  textInput.value = '';
+  opt0Input.value = '';
+  opt1Input.value = '';
+  opt2Input.value = '';
+  opt3Input.value = '';
+  
+  document.querySelectorAll("input[name='aiCorrect']").forEach(r => r.checked = false);
+  
+  aiEditIndex = null;
+}
+
+/**
+ * Create test from AI mode
+ */
+async function createAITest() {
+  if (isSubmitting) return;
+  
+  const titleInput = document.getElementById('aiTestTitle');
+  const descInput = document.getElementById('aiTestDesc');
+  const durationInput = document.getElementById('aiTestDuration');
+  const orgNameInput = document.getElementById('aiOrgName');
+  const negativeMarkingInput = document.getElementById('aiNegativeMarking');
+  
+  const title = sanitizeInput(titleInput.value.trim());
+  const description = sanitizeInput(descInput.value.trim());
+  const durationMin = Number(durationInput.value);
+  const orgName = sanitizeInput(orgNameInput.value.trim());
+  const negativeMarking = negativeMarkingInput.checked;
+  
+  // Validation
+  if (!title) {
+    showAlert('error', 'Please enter test title');
+    return;
+  }
+  
+  if (!description) {
+    showAlert('error', 'Please enter test description');
+    return;
+  }
+  
+  if (!durationMin || durationMin <= 0) {
+    showAlert('error', 'Please enter valid duration (in minutes)');
+    return;
+  }
+  
+  if (aiQuestions.length === 0) {
+    showAlert('error', 'Please generate or add at least one question');
+    return;
+  }
+  
+  isSubmitting = true;
+  
+  try {
+    const payload = {
+      title,
+      description,
+      duration: durationMin * 60 + 20,
+      questions: aiQuestions,
+      orgName: orgName || undefined,
+      logoUrl: aiLogoUrl || undefined,
+      negativeMarking: negativeMarking,
+    };
+    
+    const response = await fetch(`${API_BASE}/api/quiz/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      showAlert('error', data.msg || 'Failed to create test');
+      isSubmitting = false;
+      return;
+    }
+    
+    showAlert('success', '🎉 Test created successfully!');
+    
+    // Redirect to dashboard after brief delay
+    setTimeout(() => {
+      location.href = 'dashboard.html';
+    }, 1000);
+  } catch (err) {
+    console.error('Error creating test:', err);
+    showAlert('error', 'Server error. Please try again.');
+    isSubmitting = false;
+  }
 }

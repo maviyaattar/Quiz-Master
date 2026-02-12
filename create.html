@@ -29,22 +29,31 @@
   </head>
 
   <body>
-    <!-- ===== TOP BAR ===== -->
-    <div class="top-bar" role="banner">
-      <i
-        class="fa fa-arrow-left back-btn"
-        onclick="goBack()"
-        role="button"
-        tabindex="0"
-        aria-label="Go back to dashboard"
-        title="Back"
-      ></i>
-      <h2>Create New Test</h2>
-    </div>
+    <!-- ===== TOP NAVIGATION (Desktop) ===== -->
+    <nav class="top-nav">
+      <div class="brand">Create Test</div>
+      <div class="nav-links">
+        <a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a>
+        <a href="create.html" class="active"><i class="fa fa-plus-circle"></i> Create Test</a>
+        <a href="profile.html"><i class="fa fa-user"></i> Profile</a>
+      </div>
+    </nav>
 
     <div class="container">
-      <!-- ===== TEST INFORMATION ===== -->
-      <div class="card">
+      <!-- ===== MODE SWITCHER ===== -->
+      <div class="mode-switcher">
+        <button class="mode-btn active" data-mode="manual" onclick="switchMode('manual')">
+          <i class="fa fa-hand-pointer"></i> Manual Mode
+        </button>
+        <button class="mode-btn" data-mode="ai" onclick="switchMode('ai')">
+          <i class="fa fa-magic"></i> AI-Based Mode
+        </button>
+      </div>
+
+      <!-- ===== MANUAL MODE SECTION ===== -->
+      <div id="manualMode" class="mode-section active">
+        <!-- ===== TEST INFORMATION ===== -->
+        <div class="card">
         <h3><i class="fa fa-file-alt"></i> Test Information</h3>
         <input
           class="input"
@@ -246,6 +255,258 @@
           <i class="fa fa-check"></i> Create Test
         </button>
       </div>
+      </div>
+      <!-- End of Manual Mode Section -->
+
+      <!-- ===== AI MODE SECTION ===== -->
+      <div id="aiMode" class="mode-section">
+        <!-- ===== AI TEST INFORMATION ===== -->
+        <div class="card">
+          <h3><i class="fa fa-file-alt"></i> Test Information</h3>
+          <input
+            class="input"
+            id="aiTestTitle"
+            placeholder="Test Title"
+            type="text"
+            aria-label="Test title"
+            maxlength="100"
+          />
+          <textarea
+            class="input"
+            id="aiTestDesc"
+            placeholder="Test Description"
+            aria-label="Test description"
+            maxlength="500"
+          ></textarea>
+          <input
+            class="input"
+            id="aiTestDuration"
+            placeholder="Duration (minutes)"
+            type="number"
+            min="1"
+            max="480"
+            aria-label="Test duration in minutes"
+          />
+          
+          <!-- Optional Fields -->
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h4 style="font-size: 14px; color: var(--muted); margin-bottom: 14px;">
+              <i class="fa fa-sliders-h"></i> Optional Settings
+            </h4>
+            
+            <!-- Organization Name -->
+            <input
+              class="input"
+              id="aiOrgName"
+              placeholder="Organization Name (Optional)"
+              type="text"
+              aria-label="Organization name (optional)"
+              maxlength="100"
+            />
+            
+            <!-- Logo Upload -->
+            <div class="logo-upload-section">
+              <label for="aiLogoUpload" class="upload-label">
+                <i class="fa fa-image"></i> Upload Logo (Optional)
+              </label>
+              <input
+                type="file"
+                id="aiLogoUpload"
+                accept="image/*"
+                aria-label="Upload logo image"
+                style="display: none;"
+                onchange="handleLogoUpload(event, 'ai')"
+              />
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                onclick="document.getElementById('aiLogoUpload').click()"
+                aria-label="Choose logo file"
+              >
+                <i class="fa fa-upload"></i> Choose Logo
+              </button>
+              <div id="aiLogoPreview" class="logo-preview" style="display: none;">
+                <img id="aiLogoPreviewImage" src="" alt="Logo preview" />
+                <button 
+                  type="button" 
+                  class="remove-logo-btn" 
+                  onclick="removeLogo('ai')"
+                  aria-label="Remove logo"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+              <div id="aiLogoUploadStatus" class="upload-status"></div>
+            </div>
+            
+            <!-- Negative Marking -->
+            <div class="checkbox-option">
+              <input
+                type="checkbox"
+                id="aiNegativeMarking"
+                aria-label="Enable negative marking"
+              />
+              <label for="aiNegativeMarking">
+                Enable Negative Marking (Incorrect answers deduct 0.25 points)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== AI GENERATION SETTINGS ===== -->
+        <div class="card">
+          <h3><i class="fa fa-magic"></i> AI Generation Settings</h3>
+          
+          <label class="input-label">Difficulty Level</label>
+          <select class="input" id="difficultyLevel" aria-label="Difficulty level">
+            <option value="Easy">Easy</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+          
+          <label class="input-label">Number of Questions</label>
+          <input
+            class="input"
+            id="numQuestions"
+            placeholder="Number of Questions (1-50)"
+            type="number"
+            min="1"
+            max="50"
+            value="10"
+            aria-label="Number of questions"
+          />
+          
+          <label class="input-label">Topic/Prompt</label>
+          <textarea
+            class="input"
+            id="topicPrompt"
+            placeholder="Enter the topic or test details (e.g., 'C Programming basics including pointers, arrays, and functions' or 'JavaScript ES6 features')"
+            aria-label="Topic or prompt for AI generation"
+            rows="5"
+            maxlength="1000"
+          ></textarea>
+          
+          <button
+            class="btn btn-primary"
+            onclick="generateWithAI()"
+            id="generateBtn"
+            aria-label="Generate questions with AI"
+          >
+            <i class="fa fa-magic"></i> Generate Questions
+          </button>
+        </div>
+
+        <!-- ===== AI GENERATED QUESTIONS LIST ===== -->
+        <div class="card" id="aiQuestionsCard" style="display: none;">
+          <h3><i class="fa fa-list"></i> Generated Questions</h3>
+          <p style="color: var(--muted); margin-bottom: 14px;">
+            Review and edit the AI-generated questions below. You can also add more questions manually.
+          </p>
+          <div id="aiQuestionList" role="region" aria-live="polite"></div>
+        </div>
+
+        <!-- ===== MANUAL QUESTION BUILDER FOR AI MODE ===== -->
+        <div class="card" id="aiManualQuestionCard" style="display: none;">
+          <h3><i class="fa fa-plus-circle"></i> Add Manual Question</h3>
+
+          <textarea
+            class="input"
+            id="aiQuestionText"
+            placeholder="Question"
+            aria-label="Question text"
+            maxlength="500"
+          ></textarea>
+
+          <div class="option">
+            <input
+              type="radio"
+              name="aiCorrect"
+              value="0"
+              id="ai-correct-0"
+              aria-label="Option A is correct"
+            />
+            <input
+              class="input"
+              id="aiOpt0"
+              placeholder="Option A"
+              type="text"
+              aria-label="Option A"
+              maxlength="200"
+            />
+          </div>
+          <div class="option">
+            <input
+              type="radio"
+              name="aiCorrect"
+              value="1"
+              id="ai-correct-1"
+              aria-label="Option B is correct"
+            />
+            <input
+              class="input"
+              id="aiOpt1"
+              placeholder="Option B"
+              type="text"
+              aria-label="Option B"
+              maxlength="200"
+            />
+          </div>
+          <div class="option">
+            <input
+              type="radio"
+              name="aiCorrect"
+              value="2"
+              id="ai-correct-2"
+              aria-label="Option C is correct"
+            />
+            <input
+              class="input"
+              id="aiOpt2"
+              placeholder="Option C"
+              type="text"
+              aria-label="Option C"
+              maxlength="200"
+            />
+          </div>
+          <div class="option">
+            <input
+              type="radio"
+              name="aiCorrect"
+              value="3"
+              id="ai-correct-3"
+              aria-label="Option D is correct"
+            />
+            <input
+              class="input"
+              id="aiOpt3"
+              placeholder="Option D"
+              type="text"
+              aria-label="Option D"
+              maxlength="200"
+            />
+          </div>
+
+          <button
+            class="btn btn-secondary"
+            onclick="saveAIQuestion()"
+            aria-label="Save question"
+          >
+            <i class="fa fa-save"></i> Save Question
+          </button>
+        </div>
+
+        <!-- ===== CREATE ACTION FOR AI MODE ===== -->
+        <div class="footer-action" id="aiCreateAction" style="display: none;">
+          <button
+            class="btn btn-primary"
+            onclick="createAITest()"
+            aria-label="Create quiz"
+          >
+            <i class="fa fa-check"></i> Create Test
+          </button>
+        </div>
+      </div>
+      <!-- End of AI Mode Section -->
       
       <!-- Footer -->
       <div style="text-align: center; color: var(--muted); font-size: 14px; margin-top: 30px; padding-bottom: 20px;">
@@ -253,7 +514,26 @@
       </div>
     </div>
 
+    <!-- ===== BOTTOM NAVIGATION (Mobile) ===== -->
+    <nav class="bottom-nav">
+      <a href="dashboard.html">
+        <i class="fa fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="create.html" class="active">
+        <i class="fa fa-plus-circle"></i>
+        <span>Create</span>
+      </a>
+      <a href="profile.html">
+        <i class="fa fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
     <!-- External JavaScript -->
+    <!-- Load configuration first (contains API keys) -->
+    <script src="js/config.js"></script>
+    <!-- Load main application script -->
     <script src="js/create.js"></script>
   </body>
 </html>
