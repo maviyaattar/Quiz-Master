@@ -131,7 +131,7 @@ Simple interface for students to join quizzes.
 5. **Add More** - Optionally add manual questions alongside AI-generated ones
 6. **Create Test** - Submit the quiz with your customized question set
 
-**Note:** AI features require a valid Groq API key configured in `js/config.js`. See [Quick Start](#quick-start) for setup instructions.
+**Note:** AI features are now handled securely by the backend. No API key configuration is needed in the frontend.
 
 ### For Quiz Takers
 

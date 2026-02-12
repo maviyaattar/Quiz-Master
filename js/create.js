@@ -23,16 +23,6 @@ let aiQuestions = [];
 let aiEditIndex = null;
 let aiLogoUrl = null; // Store uploaded logo URL for AI mode
 
-/* ===== GROQ AI CONFIGURATION ===== */
-// API configuration is loaded from config.js (not committed to repository)
-// If config is not loaded, show error to user
-if (typeof CONFIG === 'undefined') {
-  console.error('Configuration not loaded! Please ensure config.js exists.');
-  console.error('Copy config.example.js to config.js and add your API key.');
-}
-const GROQ_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_API_KEY : '';
-const GROQ_URL = typeof CONFIG !== 'undefined' ? CONFIG.GROQ_URL : 'https://api.groq.com/openai/v1/chat/completions';
-
 /* ===== UTILITY: INPUT SANITIZATION ===== */
 /**
  * Sanitizes user input to prevent XSS attacks
@@ -720,7 +710,7 @@ function switchMode(mode) {
 
 /* ===== AI QUESTION GENERATION ===== */
 /**
- * Generate questions using Groq AI
+ * Generate questions using AI (via backend)
  */
 async function generateWithAI() {
   const titleInput = document.getElementById('aiTestTitle');
@@ -749,12 +739,6 @@ async function generateWithAI() {
     return;
   }
   
-  // Check if API key is configured
-  if (!GROQ_API_KEY || GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE' || GROQ_API_KEY === '') {
-    showAlert('error', 'Groq API key is not configured. Please set up your config.js file. See config.example.js for instructions.');
-    return;
-  }
-  
   // Show loading state
   const generateBtn = document.getElementById('generateBtn');
   const originalText = generateBtn.innerHTML;
@@ -762,80 +746,42 @@ async function generateWithAI() {
   generateBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating questions with AI...';
   
   try {
-    // Prepare AI prompt
-    const prompt = `Generate ${numQuestions} ${difficulty} difficulty multiple-choice questions about: ${topic}. 
-
-Return ONLY a JSON array in this exact format:
-[
-  {
-    "text": "Question text here?",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctIndex": 0
-  }
-]
-
-Requirements:
-- Exactly 4 options per question
-- correctIndex is 0-3 (index of correct answer)
-- Questions should be clear and unambiguous
-- Return ONLY the JSON array, no other text`;
-
-    // Call Groq AI API
-    const response = await fetch(GROQ_URL, {
+    // Call backend API endpoint
+    const response = await fetch(`${API_BASE}/api/quiz/generate-ai`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        model: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MODEL : 'mixtral-8x7b-32768',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a quiz question generator. Generate multiple-choice questions in valid JSON format.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_TEMPERATURE : 0.7,
-        max_tokens: typeof CONFIG !== 'undefined' ? CONFIG.GROQ_MAX_TOKENS : 4000
+        topic: topic,
+        difficulty: difficulty,
+        numQuestions: numQuestions
       })
     });
     
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.msg || 'Failed to generate questions');
     }
     
     const data = await response.json();
     
-    // Extract and parse questions
-    const content = data.choices[0].message.content.trim();
-    
-    // Try to extract JSON array from content
-    let jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      throw new Error('Failed to extract valid JSON from AI response');
-    }
-    
-    const generatedQuestions = JSON.parse(jsonMatch[0]);
-    
-    // Validate questions
-    if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
+    // Validate response
+    if (!data.questions || !Array.isArray(data.questions) || data.questions.length === 0) {
       throw new Error('No questions were generated');
     }
     
     // Validate question structure
-    for (const q of generatedQuestions) {
+    for (const q of data.questions) {
       if (!q.text || !Array.isArray(q.options) || q.options.length !== 4 || 
           typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
-        throw new Error('Invalid question format received from AI');
+        throw new Error('Invalid question format received');
       }
     }
     
     // Store generated questions
-    aiQuestions = generatedQuestions;
+    aiQuestions = data.questions;
     
     // Show questions
     renderAIQuestions();
@@ -845,7 +791,7 @@ Requirements:
     document.getElementById('aiManualQuestionCard').style.display = 'block';
     document.getElementById('aiCreateAction').style.display = 'block';
     
-    showAlert('success', `🎉 Successfully generated ${generatedQuestions.length} questions!`);
+    showAlert('success', `🎉 Successfully generated ${data.questions.length} questions!`);
     
     // Scroll to questions
     document.getElementById('aiQuestionsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -854,10 +800,10 @@ Requirements:
     console.error('Error generating questions:', err);
     let errorMsg = 'Failed to generate questions. ';
     
-    if (err.message.includes('API request failed')) {
-      errorMsg += 'API service error. Please try again later.';
-    } else if (err.message.includes('JSON')) {
-      errorMsg += 'Invalid response format. Please try again.';
+    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+      errorMsg += 'Please check your connection and try again.';
+    } else if (err.message.includes('401') || err.message.includes('authentication')) {
+      errorMsg += 'Please log in again.';
     } else {
       errorMsg += err.message || 'Please try again.';
     }
