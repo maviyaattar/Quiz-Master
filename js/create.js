@@ -683,29 +683,6 @@ function removeLogo(mode = 'manual') {
   showAlert('info', 'Logo removed');
 }
 
-/**
- * Remove uploaded logo
- */
-function removeLogo() {
-  // Clear the logo URL
-  logoUrl = null;
-
-  // Hide preview
-  const previewEl = document.getElementById('logoPreview');
-  previewEl.style.display = 'none';
-
-  // Clear the file input
-  const fileInput = document.getElementById('logoUpload');
-  fileInput.value = '';
-
-  // Clear status
-  const statusEl = document.getElementById('logoUploadStatus');
-  statusEl.innerHTML = '';
-  statusEl.className = 'upload-status';
-
-  showAlert('info', 'Logo removed');
-}
-
 /* ===== MODE SWITCHING ===== */
 /**
  * Switch between manual and AI modes

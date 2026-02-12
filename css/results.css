@@ -662,7 +662,7 @@ body {
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .container {
     padding: 18px;
   }
