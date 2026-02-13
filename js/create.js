@@ -853,30 +853,66 @@ async function generateWithAI() {
 /**
  * Render AI-generated questions
  */
+
 function renderAIQuestions() {
   const listContainer = document.getElementById('aiQuestionList');
   
   if (aiQuestions.length === 0) {
-    listContainer.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">No questions generated yet</p>';
+    listContainer.innerHTML =
+      '<p style="color: var(--muted); text-align: center; padding: 20px;">No questions generated yet</p>';
     return;
   }
   
   listContainer.innerHTML = aiQuestions
     .map((q, i) => {
-      const correctLabel = String.fromCharCode(65 + q.correctIndex);
       return `
         <div class="ai-question-item" role="article" aria-label="Question ${i + 1}">
           <div class="question-header">
             <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
-            <div class="question-actions">
-              <i class="fas fa-edit" onclick="editAIQuestion(${i})" 
-                 role="button" tabindex="0" aria-label="Edit question ${i + 1}"
-                 title="Edit question"></i>
-              <i class="fas fa-trash-alt delete" onclick="deleteAIQuestion(${i})" 
-                 role="button" tabindex="0" aria-label="Delete question ${i + 1}"
-                 title="Delete question"></i>
+
+            <div style="display:flex; gap:8px; flex-shrink:0;">
+
+              <button 
+                onclick="editAIQuestion(${i})"
+                style="
+                  padding:6px 12px;
+                  border-radius:8px;
+                  font-size:13px;
+                  font-weight:600;
+                  border:1px solid #2563eb;
+                  background:#e0f2fe;
+                  color:#2563eb;
+                  cursor:pointer;
+                  transition:0.2s ease;
+                "
+                onmouseover="this.style.background='#2563eb';this.style.color='white';"
+                onmouseout="this.style.background='#e0f2fe';this.style.color='#2563eb';"
+              >
+                Edit
+              </button>
+
+              <button 
+                onclick="deleteAIQuestion(${i})"
+                style="
+                  padding:6px 12px;
+                  border-radius:8px;
+                  font-size:13px;
+                  font-weight:600;
+                  border:1px solid #dc2626;
+                  background:#fee2e2;
+                  color:#dc2626;
+                  cursor:pointer;
+                  transition:0.2s ease;
+                "
+                onmouseover="this.style.background='#dc2626';this.style.color='white';"
+                onmouseout="this.style.background='#fee2e2';this.style.color='#dc2626';"
+              >
+                Delete
+              </button>
+
             </div>
           </div>
+
           <div class="ai-question-options">
             ${q.options.map((opt, idx) => `
               <div class="ai-question-option ${idx === q.correctIndex ? 'correct' : ''}">
@@ -889,7 +925,6 @@ function renderAIQuestions() {
     })
     .join('');
 }
-
 /**
  * Edit an AI-generated question
  * @param {number} index - Index of question to edit
