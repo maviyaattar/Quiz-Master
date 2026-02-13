@@ -45,8 +45,13 @@
     <div class="container">
       <div class="profile-card">
         <!-- Avatar -->
-        <div class="avatar skeleton skeleton-avatar" id="avatar" aria-label="User avatar">
-          ?
+        <div class="avatar-wrapper">
+          <div class="avatar skeleton skeleton-avatar" id="avatar" aria-label="User avatar">
+            ?
+          </div>
+          <div class="avatar-badge">
+            <i class="fas fa-check-circle"></i>
+          </div>
         </div>
 
         <!-- User Name -->
@@ -55,26 +60,60 @@
         <!-- User Email -->
         <div class="email skeleton skeleton-text" id="email"></div>
 
-        <!-- Role Info -->
-        <div class="info">
-          <strong>Role:</strong>
-          <span>Quiz Creator</span>
+        <!-- Stats Section -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-box">
+            <div class="stat-icon">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-value" id="totalQuizzes">0</div>
+            <div class="stat-label">Total Quizzes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value" id="totalParticipants">0</div>
+            <div class="stat-label">Participants</div>
+          </div>
         </div>
 
-        <!-- Platform Info -->
-        <div class="info">
-          <strong>Platform:</strong>
-          <span>Online Quiz Platform</span>
+        <!-- Info Section -->
+        <div class="info-section">
+          <div class="info">
+            <i class="fas fa-user-shield"></i>
+            <div>
+              <strong>Role</strong>
+              <span>Quiz Creator</span>
+            </div>
+          </div>
+
+          <div class="info">
+            <i class="fas fa-calendar-check"></i>
+            <div>
+              <strong>Member Since</strong>
+              <span id="memberSince">Loading...</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Logout Button -->
-        <button
-          class="logout"
-          onclick="logout()"
-          aria-label="Logout from your account"
-        >
-          <i class="fa fa-sign-out-alt"></i> Logout
-        </button>
+        <!-- Actions -->
+        <div class="action-buttons">
+          <button
+            class="btn btn-dashboard"
+            onclick="goToDashboard()"
+            aria-label="Go to dashboard"
+          >
+            <i class="fas fa-th-large"></i> Dashboard
+          </button>
+          <button
+            class="btn btn-logout"
+            onclick="logout()"
+            aria-label="Logout from your account"
+          >
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
       </div>
     </div>
 

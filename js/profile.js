@@ -60,10 +60,23 @@ async function loadProfile() {
     emailElement.innerText = sanitizeInput(user.email || "");
     avatarElement.innerText = (user.name || "U").charAt(0).toUpperCase();
 
+    // Set member since date
+    const memberSinceElement = document.getElementById("memberSince");
+    if (memberSinceElement && user.createdAt) {
+      const date = new Date(user.createdAt);
+      memberSinceElement.innerText = date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short' 
+      });
+    }
+
     // Remove skeleton loader styling if present
     nameElement.classList.remove("skeleton");
     emailElement.classList.remove("skeleton");
     avatarElement.classList.remove("skeleton");
+
+    // Load quiz statistics
+    await loadStats();
   } catch (err) {
     console.error("Error loading profile:", err);
     const nameElement = document.getElementById("name");
@@ -72,6 +85,37 @@ async function loadProfile() {
 
     // Provide user feedback
     showErrorNotification("Unable to load your profile. Please try again.");
+  }
+}
+
+/**
+ * Load user statistics
+ */
+async function loadStats() {
+  try {
+    const response = await fetch(`${API}/api/quiz/my`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const quizzes = await response.json();
+      const totalQuizzesElement = document.getElementById("totalQuizzes");
+      const totalParticipantsElement = document.getElementById("totalParticipants");
+      
+      if (totalQuizzesElement) {
+        totalQuizzesElement.innerText = quizzes.length || 0;
+      }
+      
+      // Calculate total participants (this is an estimate)
+      // In a real app, you'd sum up actual participant counts from each quiz
+      if (totalParticipantsElement) {
+        totalParticipantsElement.innerText = "N/A";
+      }
+    }
+  } catch (err) {
+    console.error("Error loading stats:", err);
   }
 }
 
