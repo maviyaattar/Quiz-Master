@@ -3,7 +3,7 @@
    ========================================== */
 
 // Configuration
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const API = "https://quiz-backend-production-8344.up.railway.app";
 const token = localStorage.getItem("token");
 
 // Check authentication

@@ -5,7 +5,7 @@
    ============================================ */
 
 /* ===== CONFIGURATION ===== */
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const API = "https://quiz-backend-production-8344.up.railway.app";
 
 /* ===== STATE MANAGEMENT ===== */
 let verifiedCode = null;
