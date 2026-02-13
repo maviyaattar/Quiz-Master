@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Technical Documentation</title>
+    <style>
+        /* ==========================================
+           QUIZ MASTER TECHNICAL DOCUMENTATION
+           Complete Internal Stylesheet
+           ========================================== */
+        
+        :root {
+            --primary: #5b6cff;
+            --secondary: #8f5bff;
+            --accent: #ff6b6b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8f9fa;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --code-bg: #f3f4f6;
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+        
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 80px;
+            width: 280px;
+            height: calc(100vh - 80px);
+            background: var(--card);
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar ul li a {
+            color: var(--text);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: all 0.3s;
+        }
+        
+        .sidebar ul li a:hover {
+            background: var(--bg);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 280px;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+        }
+        
+        .section {
+            background: var(--card);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .section h3 {
+            color: var(--secondary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .section h4 {
+            color: var(--text);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .section p {
+            margin-bottom: 1rem;
+            color: var(--muted);
+        }
+        
+        .section ul, .section ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section li {
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+        }
+        
+        /* ===== CODE BLOCKS ===== */
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--danger);
+        }
+        
+        pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text);
+        }
+        
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-primary { background: var(--primary); color: white; }
+        .badge-success { background: var(--success); color: white; }
+        .badge-warning { background: var(--warning); color: white; }
+        .badge-danger { background: var(--danger); color: white; }
+        
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .card h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        table tr:hover {
+            background: var(--bg);
+        }
+        
+        /* ===== DIAGRAMS ===== */
+        .diagram {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            border: 2px dashed var(--border);
+            margin: 1.5rem 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem 1rem;
+            }
+            
+            .navbar .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--muted);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ===== BACK TO TOP ===== */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            background: var(--secondary);
+        }
+        
+        .back-to-top.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <h1>📚 Quiz Master - Technical Documentation</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#overview">Overview</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#overview">Project Overview</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#tech-stack">Technology Stack</a></li>
+            <li><a href="#frontend-files">Frontend Files</a></li>
+            <li><a href="#javascript-functions">JavaScript Functions</a></li>
+            <li><a href="#api-endpoints">API Endpoints</a></li>
+            <li><a href="#css-architecture">CSS Architecture</a></li>
+            <li><a href="#key-features">Key Features</a></li>
+            <li><a href="#security">Security</a></li>
+            <li><a href="#database">Database Schema</a></li>
+            <li><a href="#workflows">Workflows</a></li>
+            <li><a href="#code-examples">Code Examples</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+            <li><a href="#future">Future Enhancements</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Section 1: Project Overview -->
+        <section id="overview" class="section">
+            <h2>1. Project Overview</h2>
+            
+            <h3>What is Quiz Master?</h3>
+            <p>Quiz Master is a comprehensive online quiz platform that enables educators and organizations to create, manage, and conduct quizzes efficiently. The platform offers both manual and AI-powered quiz creation, real-time quiz management, and detailed analytics.</p>
+            
+            <h3>Key Features</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🎯 Quiz Creation</h4>
+                    <p>Create quizzes manually or use AI to generate questions automatically from topics</p>
+                </div>
+                <div class="card">
+                    <h4>⚡ Real-time Management</h4>
+                    <p>Start, monitor, and end quizzes in real-time with live participant tracking</p>
+                </div>
+                <div class="card">
+                    <h4>📊 Analytics & Results</h4>
+                    <p>Comprehensive results dashboard with participant scores, rankings, and PDF export</p>
+                </div>
+                <div class="card">
+                    <h4>🔒 Security Features</h4>
+                    <p>Anti-cheat mechanisms including tab-switch detection and time-bound assessments</p>
+                </div>
+                <div class="card">
+                    <h4>🎨 Custom Branding</h4>
+                    <p>Upload organization logos and customize quiz appearance</p>
+                </div>
+                <div class="card">
+                    <h4>📱 Responsive Design</h4>
+                    <p>Works seamlessly across desktop, tablet, and mobile devices</p>
+                </div>
+            </div>
+            
+            <h3>User Roles</h3>
+            <ul>
+                <li><strong>Quiz Creator:</strong> Registered users who can create, manage, and analyze quizzes</li>
+                <li><strong>Participant:</strong> Anyone with a quiz code can join and attempt quizzes (no registration required)</li>
+            </ul>
+        </section>
+
+        <!-- Section 2: Architecture Overview -->
+        <section id="architecture" class="section">
+            <h2>2. Architecture Overview</h2>
+            
+            <h3>System Architecture</h3>
+            <div class="diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                     FRONTEND (HTML/CSS/JS)                   │
+│  ┌─────────┐  ┌──────────┐  ┌─────────┐  ┌──────────┐     │
+│  │ Landing │  │   Auth   │  │Dashboard│  │  Create  │     │
+│  │  Page   │  │   Page   │  │  Page   │  │   Page   │     │
+│  └────┬────┘  └────┬─────┘  └────┬────┘  └────┬─────┘     │
+│       │            │              │              │           │
+│       └────────────┴──────────────┴──────────────┘           │
+│                            │                                  │
+│                     AJAX/Fetch API                           │
+│                            │                                  │
+└────────────────────────────┼──────────────────────────────────┘
+                             │
+                             ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   BACKEND (Node.js/Express)                  │
+│  ┌───────────┐  ┌────────────┐  ┌──────────┐              │
+│  │   Auth    │  │    Quiz    │  │ Results  │              │
+│  │   APIs    │  │    APIs    │  │   APIs   │              │
+│  └─────┬─────┘  └──────┬─────┘  └────┬─────┘              │
+│        │                │              │                     │
+│        └────────────────┴──────────────┘                     │
+│                         │                                     │
+└─────────────────────────┼───────────────────────────────────┘
+                          │
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    DATABASE (MongoDB)                        │
+│  ┌────────────┐  ┌────────────┐  ┌──────────────┐         │
+│  │  Creators  │  │   Quizzes  │  │ Submissions  │         │
+│  │ Collection │  │ Collection │  │  Collection  │         │
+│  └────────────┘  └────────────┘  └──────────────┘         │
+└─────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+            
+            <h3>Frontend Architecture</h3>
+            <p>The frontend is built using vanilla JavaScript with a modular approach:</p>
+            <ul>
+                <li><strong>HTML5:</strong> Semantic markup for structure</li>
+                <li><strong>CSS3:</strong> Custom stylesheets with CSS variables for theming</li>
+                <li><strong>JavaScript (ES6+):</strong> Modern JavaScript for interactivity and API communication</li>
+            </ul>
+            
+            <h3>Backend Architecture</h3>
+            <p>RESTful API built with Node.js and Express:</p>
+            <ul>
+                <li><strong>Route Handlers:</strong> Organized by feature (auth, quiz, results)</li>
+                <li><strong>Middleware:</strong> Authentication, validation, error handling</li>
+                <li><strong>Database Layer:</strong> Mongoose ODM for MongoDB operations</li>
+            </ul>
+        </section>
+
+        <!-- Section 3: Technology Stack -->
+        <section id="tech-stack" class="section">
+            <h2>3. Technology Stack</h2>
+            
+            <h3>Frontend Technologies</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Version</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HTML5</td>
+                        <td>Latest</td>
+                        <td>Semantic markup and structure</td>
+                    </tr>
+                    <tr>
+                        <td>CSS3</td>
+                        <td>Latest</td>
+                        <td>Styling, animations, and responsive design</td>
+                    </tr>
+                    <tr>
+                        <td>JavaScript (ES6+)</td>
+                        <td>Latest</td>
+                        <td>Client-side logic and API communication</td>
+                    </tr>
+                    <tr>
+                        <td>Font Awesome</td>
+                        <td>6.5.0</td>
+                        <td>Icon library</td>
+                    </tr>
+                    <tr>
+                        <td>Google Fonts (Poppins)</td>
+                        <td>Latest</td>
+                        <td>Typography</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Backend Technologies</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node.js</td>
+                        <td>JavaScript runtime environment</td>
+                    </tr>
+                    <tr>
+                        <td>Express.js</td>
+                        <td>Web application framework</td>
+                    </tr>
+                    <tr>
+                        <td>MongoDB</td>
+                        <td>NoSQL database</td>
+                    </tr>
+                    <tr>
+                        <td>Mongoose</td>
+                        <td>MongoDB object modeling</td>
+                    </tr>
+                    <tr>
+                        <td>JWT (jsonwebtoken)</td>
+                        <td>Authentication and authorization</td>
+                    </tr>
+                    <tr>
+                        <td>bcryptjs</td>
+                        <td>Password hashing</td>
+                    </tr>
+                    <tr>
+                        <td>Cloudinary</td>
+                        <td>Image/logo upload and storage</td>
+                    </tr>
+                    <tr>
+                        <td>PDFKit</td>
+                        <td>PDF generation for certificates</td>
+                    </tr>
+                    <tr>
+                        <td>Multer</td>
+                        <td>File upload middleware</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI API</td>
+                        <td>AI-powered quiz generation</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Deployment</h3>
+            <ul>
+                <li><strong>Backend:</strong> Railway Platform (https://quiz-backend-production-8344.up.railway.app)</li>
+                <li><strong>Frontend:</strong> Static hosting (GitHub Pages, Netlify, or Vercel compatible)</li>
+                <li><strong>Database:</strong> MongoDB Atlas (cloud database)</li>
+            </ul>
+        </section>
+
+        <!-- Section 4: Frontend Files -->
+        <section id="frontend-files" class="section">
+            <h2>4. Frontend Files Explanation</h2>
+            
+            <h3>HTML Pages</h3>
+            
+            <h4>index.html - Landing Page</h4>
+            <p><span class="badge badge-primary">Public</span></p>
+            <p><strong>Purpose:</strong> Welcome page that introduces Quiz Master and provides navigation to authentication and quiz joining.</p>
+            <ul>
+                <li>Hero section with platform overview</li>
+                <li>Feature highlights</li>
+                <li>Role selection (Creator vs Participant)</li>
+            </ul>
+            
+            <h4>auth.html - Authentication Page</h4>
+            <p><span class="badge badge-primary">Public</span></p>
+            <p><strong>Purpose:</strong> User registration and login page for quiz creators.</p>
+            <ul>
+                <li>Login form with email and password</li>
+                <li>Registration form with name, email, and password</li>
+                <li>Tab-based interface to switch between login and register</li>
+                <li>Client-side validation and error handling</li>
+            </ul>
+            
+            <h4>dashboard.html - Quiz Dashboard</h4>
+            <p><span class="badge badge-warning">Protected</span></p>
+            <p><strong>Purpose:</strong> Main dashboard for quiz creators to view and manage their quizzes.</p>
+            <ul>
+                <li>Grid display of all user quizzes</li>
+                <li>Status indicators (Created, Live, Ended)</li>
+                <li>Click-to-view quiz details</li>
+                <li>Navigation to create new quizzes</li>
+            </ul>
+            
+            <h4>create.html - Create Quiz Page</h4>
+            <p><span class="badge badge-warning">Protected</span></p>
+            <p><strong>Purpose:</strong> Create and edit quizzes with manual or AI-assisted mode.</p>
+            <ul>
+                <li><strong>Manual Mode:</strong> Add questions one by one with options and correct answers</li>
+                <li><strong>AI Mode:</strong> Generate questions automatically using AI based on topic and count</li>
+                <li>Logo upload functionality</li>
+                <li>Quiz metadata (title, description, duration)</li>
+                <li>Question preview and editing</li>
+            </ul>
+            
+            <h4>join.html - Join Quiz Page</h4>
+            <p><span class="badge badge-primary">Public</span></p>
+            <p><strong>Purpose:</strong> Entry point for participants to join quizzes using a code.</p>
+            <ul>
+                <li>Step 1: Enter and verify quiz code</li>
+                <li>Step 2: Enter participant details (name, roll number, branch)</li>
+                <li>Progress indicator showing current step</li>
+                <li>Code validation before proceeding</li>
+            </ul>
+            
+            <h4>attempt.html - Take Quiz Page</h4>
+            <p><span class="badge badge-primary">Public</span></p>
+            <p><strong>Purpose:</strong> Interface for participants to attempt the quiz.</p>
+            <ul>
+                <li>Wait screen until quiz starts</li>
+                <li>Question navigation (previous/next)</li>
+                <li>Timer display and auto-submit on timeout</li>
+                <li>Anti-cheat tab-switch detection</li>
+                <li>Answer selection and submission</li>
+            </ul>
+            
+            <h4>test.html - Quiz Details & Management</h4>
+            <p><span class="badge badge-warning">Protected</span></p>
+            <p><strong>Purpose:</strong> Detailed view and management controls for a specific quiz.</p>
+            <ul>
+                <li>Quiz information display</li>
+                <li>Start/Stop quiz controls</li>
+                <li>Edit quiz button</li>
+                <li>Delete quiz functionality</li>
+                <li>Reset quiz option</li>
+                <li>Copy quiz code and join link</li>
+            </ul>
+            
+            <h4>results.html - Results & Analytics</h4>
+            <p><span class="badge badge-warning">Protected</span></p>
+            <p><strong>Purpose:</strong> View quiz results, participant scores, and generate reports.</p>
+            <ul>
+                <li>Participant list with scores</li>
+                <li>Leaderboard/ranking</li>
+                <li>Individual result details</li>
+                <li>PDF download for participants</li>
+                <li>Search and filter functionality</li>
+            </ul>
+            
+            <h4>profile.html - User Profile</h4>
+            <p><span class="badge badge-warning">Protected</span></p>
+            <p><strong>Purpose:</strong> User profile page showing account information and statistics.</p>
+            <ul>
+                <li>User avatar and basic info</li>
+                <li>Account statistics (total quizzes, participants)</li>
+                <li>Logout functionality</li>
+            </ul>
+        </section>
+        <!-- Section 5: JavaScript Functions -->
+        <section id="javascript-functions" class="section">
+            <h2>5. JavaScript Functions Documentation</h2>
+            
+            <h3>File: js/script.js (Authentication)</h3>
+            
+            <h4>Function: sanitizeInput(input)</h4>
+            <p><span class="badge badge-success">Security</span></p>
+            <pre><code>Purpose: Sanitizes user input to prevent XSS attacks
+Parameters: input (string) - Raw user input
+Returns: string - Sanitized input
+Flow:
+  1. Creates a temporary div element
+  2. Sets textContent (auto-escapes HTML)
+  3. Returns the escaped innerHTML</code></pre>
+            
+            <h4>Function: login(e)</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Handles user login
+Parameters: e (Event) - Form submit event
+Returns: void
+Flow:
+  1. Prevents form default submission
+  2. Sanitizes email and password inputs
+  3. Validates input presence
+  4. Sends POST request to /api/auth/login
+  5. Stores JWT token in localStorage
+  6. Redirects to dashboard.html on success
+  7. Shows error message on failure</code></pre>
+            
+            <h4>Function: registerUser(e)</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Handles user registration
+Parameters: e (Event) - Form submit event
+Returns: void
+Flow:
+  1. Prevents form default submission
+  2. Sanitizes name, email, and password
+  3. Validates all fields are filled
+  4. Sends POST request to /api/auth/register
+  5. Stores JWT token in localStorage
+  6. Redirects to dashboard.html on success
+  7. Shows error message on failure</code></pre>
+            
+            <h3>File: js/dashboard.js</h3>
+            
+            <h4>Function: loadQuizzes()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Fetches and displays user's quizzes
+Parameters: None
+Returns: void
+Flow:
+  1. Shows loading state
+  2. Fetches quizzes from /api/quiz/my with auth header
+  3. Handles empty state if no quizzes
+  4. Renders quiz cards with title, description, and status
+  5. Sanitizes all displayed content
+  6. Handles errors with error state display</code></pre>
+            
+            <h4>Function: openTest(code)</h4>
+            <pre><code>Purpose: Navigate to quiz details page
+Parameters: code (string) - Quiz code
+Returns: void
+Flow:
+  1. Redirects to test.html with code parameter</code></pre>
+            
+            <h3>File: js/create.js</h3>
+            
+            <h4>Function: saveQuestion()</h4>
+            <p><span class="badge badge-warning">Complex</span></p>
+            <pre><code>Purpose: Saves or updates a question in the quiz
+Parameters: None (reads from form inputs)
+Returns: void
+Flow:
+  1. Gets question text and options from inputs
+  2. Validates all fields are filled
+  3. Sanitizes input data
+  4. Determines correct answer index
+  5. If editing: updates existing question
+  6. If new: adds to questions array
+  7. Re-renders question list
+  8. Clears form inputs
+  9. Shows success message</code></pre>
+            
+            <h4>Function: submitQuiz()</h4>
+            <p><span class="badge badge-primary">Async</span> <span class="badge badge-warning">Critical</span></p>
+            <pre><code>Purpose: Submits quiz to backend
+Parameters: None
+Returns: void
+Flow:
+  1. Validates quiz has title, description, duration
+  2. Validates at least one question exists
+  3. Sanitizes all quiz data
+  4. Constructs quiz payload with metadata
+  5. Sends POST request to /api/quiz/create
+  6. Handles success: redirects to dashboard
+  7. Handles error: shows error message</code></pre>
+            
+            <h4>Function: generateAIQuestions()</h4>
+            <p><span class="badge badge-primary">Async</span> <span class="badge badge-success">AI-Powered</span></p>
+            <pre><code>Purpose: Generates questions using AI
+Parameters: None (reads from form)
+Returns: void
+Flow:
+  1. Gets topic, count, and difficulty from inputs
+  2. Validates inputs
+  3. Shows loading state
+  4. Sends POST request to /api/quiz/generate-ai
+  5. Receives AI-generated questions
+  6. Populates aiQuestions array
+  7. Renders questions in AI mode
+  8. Shows success message</code></pre>
+            
+            <h3>File: js/join.js</h3>
+            
+            <h4>Function: verifyCode()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Verifies quiz code before joining
+Parameters: None
+Returns: void
+Flow:
+  1. Gets and sanitizes quiz code
+  2. Validates code format (3-10 alphanumeric)
+  3. Sends POST request to /api/quiz/join/{code}
+  4. Checks quiz status (created/allowed/ended)
+  5. If valid: proceeds to step 2 (participant details)
+  6. Updates progress indicator
+  7. Shows error if code invalid or quiz ended</code></pre>
+            
+            <h4>Function: joinQuiz()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Joins quiz with participant details
+Parameters: None
+Returns: void
+Flow:
+  1. Gets name, roll number, and branch
+  2. Validates all required fields
+  3. Sanitizes participant data
+  4. Stores in localStorage as 'joiner'
+  5. Redirects to attempt.html with code parameter</code></pre>
+            
+            <h3>File: js/attempt.js</h3>
+            
+            <h4>Function: startQuizAttempt()</h4>
+            <p><span class="badge badge-primary">Async</span> <span class="badge badge-warning">Complex</span></p>
+            <pre><code>Purpose: Fetches quiz and starts attempt
+Parameters: None
+Returns: void
+Flow:
+  1. Fetches quiz from /api/quiz/join/{code}
+  2. Checks if quiz is live
+  3. Initializes questions array
+  4. Initializes answers array (all null)
+  5. Sets up timer based on duration
+  6. Shows first question
+  7. Enables tab-switch detection</code></pre>
+            
+            <h4>Function: submitQuiz()</h4>
+            <p><span class="badge badge-primary">Async</span> <span class="badge badge-danger">Critical</span></p>
+            <pre><code>Purpose: Submits quiz answers
+Parameters: None
+Returns: void
+Flow:
+  1. Prepares submission data with answers
+  2. Includes participant info and warnings
+  3. Sends POST request to /api/quiz/submit/{code}
+  4. Stops timer
+  5. Stores result in localStorage
+  6. Shows success/failure message
+  7. Can redirect or show results</code></pre>
+            
+            <h3>File: js/test.js</h3>
+            
+            <h4>Function: loadQuizDetails()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Loads quiz details and metadata
+Parameters: None
+Returns: void
+Flow:
+  1. Fetches quiz from /api/quiz/details/{code}
+  2. Displays title, description, code
+  3. Updates status badge
+  4. Generates join link
+  5. Updates UI elements</code></pre>
+            
+            <h4>Function: startQuiz()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Starts the quiz (changes status to live)
+Parameters: None
+Returns: void
+Flow:
+  1. Confirms action with user
+  2. Sends PUT request to /api/quiz/start/{code}
+  3. Updates status badge to "live"
+  4. Shows success message
+  5. Updates UI state</code></pre>
+            
+            <h4>Function: deleteQuiz()</h4>
+            <p><span class="badge badge-danger">Destructive</span></p>
+            <pre><code>Purpose: Deletes the quiz permanently
+Parameters: None
+Returns: void
+Flow:
+  1. Confirms deletion with user
+  2. Sends DELETE request to /api/quiz/{code}
+  3. Shows success message
+  4. Redirects to dashboard</code></pre>
+            
+            <h3>File: js/results.js</h3>
+            
+            <h4>Function: loadResults()</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Loads quiz results and participants
+Parameters: None
+Returns: void
+Flow:
+  1. Fetches results from /api/quiz/results/{code}
+  2. Processes participant submissions
+  3. Calculates scores and rankings
+  4. Renders participant list
+  5. Updates statistics
+  6. Enables search and filter</code></pre>
+            
+            <h4>Function: downloadPDF(rollNo)</h4>
+            <p><span class="badge badge-primary">Async</span></p>
+            <pre><code>Purpose: Downloads participant certificate
+Parameters: rollNo (string) - Participant roll number
+Returns: void
+Flow:
+  1. Sanitizes roll number
+  2. Requests PDF from backend
+  3. Creates blob from response
+  4. Triggers download in browser</code></pre>
+        </section>
+        <!-- Section 6: API Endpoints -->
+        <section id="api-endpoints" class="section">
+            <h2>6. API Endpoints Documentation</h2>
+            
+            <h3>Authentication APIs</h3>
+            
+            <h4>POST /api/auth/register</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Register new quiz creator</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ name: string, email: string, password: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ token: string, msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>No</td>
+                </tr>
+            </table>
+            <pre><code>// Example Usage
+const response = await fetch('${API}/api/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: 'John Doe',
+    email: 'john@example.com',
+    password: 'securepass123'
+  })
+});</code></pre>
+            
+            <h4>POST /api/auth/login</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Login existing user</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ email: string, password: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ token: string, msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>No</td>
+                </tr>
+            </table>
+            
+            <h4>GET /api/auth/me</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Get current user profile</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ name: string, email: string, createdAt: Date }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes (Bearer token)</td>
+                </tr>
+            </table>
+            
+            <h3>Quiz Management APIs</h3>
+            
+            <h4>POST /api/quiz/create</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Create new quiz</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ title, description, duration, questions[], orgName?, logoUrl? }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ code: string, msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>GET /api/quiz/my</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Get all quizzes created by user</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>[{ code, title, description, status, createdAt }]</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>GET /api/quiz/details/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Get quiz details by code</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ title, description, duration, questions, status, orgName, logoUrl }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>PUT /api/quiz/start/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Start quiz (change status to live)</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>PUT /api/quiz/end/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>End quiz (change status to ended)</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>DELETE /api/quiz/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Delete quiz permanently</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ msg: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h3>Quiz Participation APIs</h3>
+            
+            <h4>POST /api/quiz/join/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Join quiz or verify code</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ rollNo: string }</code> (use "VERIFY" to just check status)</td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ status: string, questions?: [], duration?: number }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>No</td>
+                </tr>
+            </table>
+            
+            <h4>POST /api/quiz/submit/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Submit quiz answers</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ name, rollNo, branch, answers[], warnings }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ score: number, total: number, percentage: number }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>No</td>
+                </tr>
+            </table>
+            
+            <h3>Results & Analytics APIs</h3>
+            
+            <h4>GET /api/quiz/results/:code</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Get quiz results and all submissions</td>
+                </tr>
+                <tr>
+                    <td><strong>URL Parameters</strong></td>
+                    <td><code>code: string</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ quiz: {}, submissions: [] }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h3>AI & Media APIs</h3>
+            
+            <h4>POST /api/quiz/generate-ai</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Generate quiz questions using AI</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>{ topic: string, count: number, difficulty: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ questions: [] }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+            
+            <h4>POST /api/upload/logo</h4>
+            <table>
+                <tr>
+                    <td><strong>Purpose</strong></td>
+                    <td>Upload organization logo</td>
+                </tr>
+                <tr>
+                    <td><strong>Request Body</strong></td>
+                    <td><code>FormData with 'logo' file</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Response</strong></td>
+                    <td><code>{ url: string }</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Required</strong></td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Section 7: CSS Architecture -->
+        <section id="css-architecture" class="section">
+            <h2>7. CSS Architecture</h2>
+            
+            <h3>CSS Variable System</h3>
+            <p>The application uses CSS custom properties (variables) for consistent theming:</p>
+            <pre><code>:root {
+  --primary: #5b6cff;      /* Main brand color */
+  --secondary: #8f5bff;    /* Secondary accent */
+  --bg: #f6f7fb;           /* Background color */
+  --card: #ffffff;         /* Card background */
+  --text: #1f2937;         /* Primary text color */
+  --muted: #6b7280;        /* Secondary text */
+  --radius: 18px;          /* Border radius */
+  --transition: all 0.3s ease; /* Animation timing */
+}</code></pre>
+            
+            <h3>Design System</h3>
+            
+            <h4>Colors</h4>
+            <ul>
+                <li><strong>Primary Blue (#5b6cff):</strong> Main brand color, CTAs, links</li>
+                <li><strong>Secondary Purple (#8f5bff):</strong> Gradients, accents</li>
+                <li><strong>Success Green (#22c55e):</strong> Success messages, live status</li>
+                <li><strong>Warning Orange (#f59e0b):</strong> Created status, warnings</li>
+                <li><strong>Danger Red (#ef4444):</strong> Errors, delete actions, ended status</li>
+            </ul>
+            
+            <h4>Typography</h4>
+            <ul>
+                <li><strong>Font Family:</strong> Poppins (Google Fonts)</li>
+                <li><strong>Weights:</strong> 300 (Light), 400 (Regular), 500 (Medium), 600 (Semi-Bold), 700 (Bold), 800 (Extra-Bold)</li>
+                <li><strong>Base Size:</strong> 16px</li>
+                <li><strong>Line Height:</strong> 1.6 for body text</li>
+            </ul>
+            
+            <h4>Spacing</h4>
+            <p>Consistent spacing scale using multiples of 4px:</p>
+            <ul>
+                <li>Small: 8px, 12px</li>
+                <li>Medium: 16px, 20px, 24px</li>
+                <li>Large: 32px, 40px, 48px</li>
+            </ul>
+            
+            <h3>Responsive Breakpoints</h3>
+            <pre><code>/* Mobile First Approach */
+/* Small devices (phones) */
+Default: 320px - 767px
+
+/* Medium devices (tablets) */
+@media (min-width: 768px) { ... }
+
+/* Large devices (desktops) */
+@media (min-width: 1024px) { ... }
+
+/* Extra large devices */
+@media (min-width: 1280px) { ... }</code></pre>
+            
+            <h3>Reusable CSS Classes</h3>
+            <pre><code>/* Buttons */
+.btn                /* Base button styles */
+.btn-primary        /* Primary action button */
+.btn-outline        /* Outline button */
+.btn-danger         /* Destructive action */
+
+/* Cards */
+.card               /* Base card with shadow */
+.quiz-card          /* Quiz display card */
+.profile-card       /* Profile information card */
+
+/* Status Badges */
+.status             /* Base status badge */
+.created            /* Yellow badge */
+.live               /* Green badge with pulse */
+.ended              /* Red badge */
+
+/* Layout */
+.container          /* Max-width container */
+.grid               /* CSS Grid layout */
+.flex               /* Flexbox layout */
+
+/* Utilities */
+.skeleton           /* Loading placeholder */
+.empty              /* Empty state */
+.msg                /* Message/notification */</code></pre>
+        </section>
+        <!-- Section 8: Key Features -->
+        <section id="key-features" class="section">
+            <h2>8. Key Features Explanation</h2>
+            
+            <h3>User Authentication (JWT-based)</h3>
+            <p><strong>How it works:</strong></p>
+            <ol>
+                <li>User submits login/register form</li>
+                <li>Backend validates credentials and hashes password (bcryptjs)</li>
+                <li>Backend generates JWT token with user ID payload</li>
+                <li>Token sent to frontend and stored in localStorage</li>
+                <li>All protected API requests include token in Authorization header</li>
+                <li>Backend middleware verifies token on each request</li>
+            </ol>
+            <pre><code>// Example: Using JWT token
+const response = await fetch('${API}/api/quiz/my', {
+  headers: {
+    'Authorization': 'Bearer ' + localStorage.getItem('token')
+  }
+});</code></pre>
+            
+            <h3>Quiz Creation: Manual vs AI Mode</h3>
+            
+            <h4>Manual Mode</h4>
+            <p>Traditional approach where creators add questions one by one:</p>
+            <ul>
+                <li>Fill in question text</li>
+                <li>Add 4 multiple-choice options</li>
+                <li>Select correct answer</li>
+                <li>Questions stored in array and can be edited/deleted</li>
+                <li>Preview questions before submission</li>
+            </ul>
+            
+            <h4>AI Mode (OpenAI Integration)</h4>
+            <p>Automated question generation:</p>
+            <ul>
+                <li>User provides: Topic, Number of questions, Difficulty level</li>
+                <li>Backend sends structured prompt to OpenAI API</li>
+                <li>AI generates questions in required JSON format</li>
+                <li>Questions parsed and validated on backend</li>
+                <li>Frontend receives and displays for review</li>
+                <li>Creator can edit AI-generated questions before saving</li>
+            </ul>
+            
+            <h3>Real-time Quiz Joining: Polling Mechanism</h3>
+            <p>Since WebSockets aren't used, the app implements polling:</p>
+            <ol>
+                <li>Participant joins with code and enters wait screen</li>
+                <li>Frontend polls /api/quiz/join/:code every 3-5 seconds</li>
+                <li>Checks if quiz status changed from "created" to "live"</li>
+                <li>When live, quiz questions are loaded and timer starts</li>
+                <li>This simulates real-time without WebSocket complexity</li>
+            </ol>
+            
+            <h3>Quiz Attempt Flow</h3>
+            
+            <h4>Timer Implementation</h4>
+            <pre><code>// Timer decrements every second
+let timeLeft = quizDuration * 60; // Convert minutes to seconds
+const timerInterval = setInterval(() => {
+  timeLeft--;
+  updateTimerDisplay();
+  
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    autoSubmitQuiz(); // Force submit
+  }
+}, 1000);</code></pre>
+            
+            <h4>Question Navigation</h4>
+            <ul>
+                <li>Questions displayed one at a time</li>
+                <li>Previous/Next buttons for navigation</li>
+                <li>Answers stored in array (index-based)</li>
+                <li>Visual indicator for answered questions</li>
+                <li>Can change answers before submission</li>
+            </ul>
+            
+            <h4>Anti-Cheat: Tab Switch Detection</h4>
+            <pre><code>// Detect when user leaves the quiz tab
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    warnings++;
+    showWarning('Tab switching detected! Warning ' + warnings);
+    // Warnings included in submission
+  }
+});</code></pre>
+            
+            <h3>Results & Analytics</h3>
+            
+            <h4>Score Calculation</h4>
+            <pre><code>// Backend calculates score
+let correctCount = 0;
+submission.answers.forEach((answer, index) => {
+  if (answer === quiz.questions[index].correctIndex) {
+    correctCount++;
+  }
+});
+
+const score = correctCount;
+const total = quiz.questions.length;
+const percentage = (score / total) * 100;</code></pre>
+            
+            <h4>Leaderboard/Ranking</h4>
+            <ul>
+                <li>All submissions sorted by score (descending)</li>
+                <li>Rank assigned based on position</li>
+                <li>Ties handled by submission time (earlier is better)</li>
+                <li>Search and filter by name/roll number</li>
+            </ul>
+            
+            <h3>Logo Upload (Cloudinary Integration)</h3>
+            <ol>
+                <li>User selects image file</li>
+                <li>File sent to backend via multipart/form-data</li>
+                <li>Multer middleware processes file upload</li>
+                <li>Backend uploads to Cloudinary (cloud storage)</li>
+                <li>Cloudinary returns secure URL</li>
+                <li>URL saved with quiz data and displayed on attempt page</li>
+            </ol>
+            
+            <h3>PDF Export (PDFKit)</h3>
+            <p>Backend generates PDF certificates for participants:</p>
+            <ul>
+                <li>Uses PDFKit library to create PDF documents</li>
+                <li>Includes quiz name, participant details, score</li>
+                <li>Can include organization logo if uploaded</li>
+                <li>PDF sent as blob to frontend</li>
+                <li>Frontend triggers download</li>
+            </ul>
+        </section>
+
+        <!-- Section 9: Security -->
+        <section id="security" class="section">
+            <h2>9. Security Implementations</h2>
+            
+            <h3>Input Sanitization</h3>
+            <p>All user inputs are sanitized to prevent XSS attacks:</p>
+            <pre><code>function sanitizeInput(input) {
+  const div = document.createElement('div');
+  div.textContent = input; // Automatically escapes HTML
+  return div.innerHTML;
+}
+
+// Usage
+const safeName = sanitizeInput(userInput);</code></pre>
+            
+            <h3>XSS Prevention</h3>
+            <ul>
+                <li>All user-generated content escaped before display</li>
+                <li>Using textContent instead of innerHTML where possible</li>
+                <li>Server-side validation and sanitization</li>
+                <li>Content Security Policy headers on backend</li>
+            </ul>
+            
+            <h3>CSRF Protection</h3>
+            <ul>
+                <li>JWT tokens in Authorization headers (not cookies)</li>
+                <li>SameSite cookie attributes if cookies used</li>
+                <li>Origin checking on backend</li>
+            </ul>
+            
+            <h3>Password Security</h3>
+            <pre><code>// Backend hashing with bcryptjs
+const salt = await bcrypt.genSalt(10);
+const hashedPassword = await bcrypt.hash(password, salt);
+
+// Verification
+const isMatch = await bcrypt.compare(inputPassword, storedHash);</code></pre>
+            
+            <h3>JWT Token Security</h3>
+            <ul>
+                <li>Tokens signed with secret key</li>
+                <li>Expiration time set (typically 7 days)</li>
+                <li>Tokens verified on each protected route</li>
+                <li>Token payload minimal (only user ID)</li>
+                <li>Stored in localStorage (consider httpOnly cookies for production)</li>
+            </ul>
+            
+            <h3>API Security Measures</h3>
+            <ul>
+                <li>Rate limiting on authentication endpoints</li>
+                <li>Input validation with Joi/express-validator</li>
+                <li>Error messages don't leak sensitive info</li>
+                <li>CORS configured for specific origins</li>
+                <li>HTTPS enforced on production</li>
+            </ul>
+            
+            <h3>Database Security</h3>
+            <ul>
+                <li>MongoDB connection string in environment variables</li>
+                <li>No raw queries (using Mongoose ODM)</li>
+                <li>Input validation before database operations</li>
+                <li>Sensitive data encrypted at rest</li>
+            </ul>
+        </section>
+
+        <!-- Section 10: Database Schema -->
+        <section id="database" class="section">
+            <h2>10. Database Schema (MongoDB)</h2>
+            
+            <h3>Creator Collection</h3>
+            <pre><code>{
+  _id: ObjectId,
+  name: String,
+  email: String (unique, indexed),
+  password: String (hashed),
+  createdAt: Date,
+  updatedAt: Date
+}</code></pre>
+            
+            <h3>Quiz Collection</h3>
+            <pre><code>{
+  _id: ObjectId,
+  code: String (unique, indexed, 6-char alphanumeric),
+  creator: ObjectId (ref: Creator),
+  title: String,
+  description: String,
+  duration: Number (minutes),
+  questions: [
+    {
+      text: String,
+      options: [String, String, String, String],
+      correctIndex: Number (0-3)
+    }
+  ],
+  status: String (enum: 'created', 'live', 'ended'),
+  orgName: String (optional),
+  logoUrl: String (optional),
+  createdAt: Date,
+  updatedAt: Date
+}</code></pre>
+            
+            <h3>Submission Collection</h3>
+            <pre><code>{
+  _id: ObjectId,
+  quiz: ObjectId (ref: Quiz),
+  name: String,
+  rollNo: String (indexed),
+  branch: String,
+  answers: [Number] (array of selected option indices),
+  score: Number,
+  totalQuestions: Number,
+  percentage: Number,
+  warnings: Number (tab switches),
+  submittedAt: Date
+}</code></pre>
+            
+            <h3>Indexes</h3>
+            <ul>
+                <li><strong>Creator.email:</strong> Unique index for fast lookups</li>
+                <li><strong>Quiz.code:</strong> Unique index for quiz code searches</li>
+                <li><strong>Quiz.creator:</strong> Index for fetching user's quizzes</li>
+                <li><strong>Submission.quiz:</strong> Index for fetching quiz results</li>
+                <li><strong>Submission.rollNo:</strong> Index for participant searches</li>
+            </ul>
+        </section>
+
+        <!-- Section 11: Workflows -->
+        <section id="workflows" class="section">
+            <h2>11. Workflow Diagrams</h2>
+            
+            <h3>User Registration/Login Flow</h3>
+            <div class="diagram">
+                <pre>
+User Opens auth.html
+        │
+        ↓
+Selects Login/Register Tab
+        │
+        ├─────────────────────────┐
+        ↓                         ↓
+    LOGIN FLOW              REGISTER FLOW
+        │                         │
+        ↓                         ↓
+Enters email/password    Enters name/email/password
+        │                         │
+        ↓                         ↓
+JavaScript validates     JavaScript validates
+        │                         │
+        ↓                         ↓
+POST /api/auth/login    POST /api/auth/register
+        │                         │
+        ↓                         ↓
+Backend validates       Backend hashes password
+        │                         │
+        ↓                         ↓
+Backend generates JWT   Backend generates JWT
+        │                         │
+        └─────────┬───────────────┘
+                  ↓
+        Token stored in localStorage
+                  │
+                  ↓
+        Redirect to dashboard.html
+                </pre>
+            </div>
+            
+            <h3>Quiz Creation Flow (Manual Mode)</h3>
+            <div class="diagram">
+                <pre>
+Creator Opens create.html
+        │
+        ↓
+Selects "Manual Mode"
+        │
+        ↓
+Enters Quiz Metadata
+(Title, Description, Duration)
+        │
+        ↓
+FOR EACH QUESTION:
+│ Enters question text
+│ Enters 4 options
+│ Selects correct answer
+│ Clicks "Add Question"
+│ Question added to array
+│ Displayed in list
+└─────┐
+      ↓
+All Questions Added?
+      │
+      ↓ YES
+Clicks "Submit Quiz"
+      │
+      ↓
+JavaScript validates:
+- Has title, description, duration
+- Has at least 1 question
+      │
+      ↓
+POST /api/quiz/create
+      │
+      ↓
+Backend saves to database
+Generates unique code
+      │
+      ↓
+Success! Redirect to dashboard
+                </pre>
+            </div>
+            
+            <h3>Quiz Joining Flow</h3>
+            <div class="diagram">
+                <pre>
+Participant Opens join.html
+        │
+        ↓
+Enters Quiz Code
+        │
+        ↓
+Clicks "Continue"
+        │
+        ↓
+POST /api/quiz/join/:code (verify)
+        │
+        ├─── Code Invalid? ──> Error Message
+        │
+        ├─── Quiz Ended? ──> Error Message
+        │
+        ↓ Code Valid
+Shows Step 2: Enter Details
+        │
+        ↓
+Participant Enters:
+- Name
+- Roll Number
+- Branch
+        │
+        ↓
+Clicks "Join Quiz"
+        │
+        ↓
+Data stored in localStorage
+        │
+        ↓
+Redirect to attempt.html?code=XXX
+                </pre>
+            </div>
+            
+            <h3>Quiz Attempt Flow</h3>
+            <div class="diagram">
+                <pre>
+Participant on attempt.html
+        │
+        ↓
+Shows Wait Screen
+        │
+        ↓
+Polls /api/quiz/join/:code every 3s
+        │
+        ├─── Status = "created"? ──> Keep Waiting
+        │
+        ↓ Status = "live"
+Fetch Questions & Duration
+        │
+        ↓
+Initialize Timer
+        │
+        ↓
+Show First Question
+        │
+        ↓
+┌───── Question Loop ─────┐
+│ Participant reads question│
+│ Selects an option        │
+│ Clicks Next/Previous     │
+│ Answer stored in array   │
+└──────────┬───────────────┘
+           │
+           ↓
+All Answered OR Time Up?
+           │
+           ↓
+POST /api/quiz/submit/:code
+{answers, name, rollNo, warnings}
+           │
+           ↓
+Backend calculates score
+           │
+           ↓
+Shows Result: Score/Total
+           │
+           ↓
+Option to view detailed results
+                </pre>
+            </div>
+            
+            <h3>Results Viewing Flow</h3>
+            <div class="diagram">
+                <pre>
+Creator Opens results.html?code=XXX
+        │
+        ↓
+GET /api/quiz/results/:code
+        │
+        ↓
+Backend fetches:
+- Quiz details
+- All submissions
+        │
+        ↓
+Frontend processes:
+- Calculates rankings
+- Sorts by score
+        │
+        ↓
+Displays Participant List:
+- Name, Roll No, Score, Rank
+        │
+        ├──> Search by name/roll
+        ├──> Filter by score range
+        ├──> Download individual PDFs
+        └──> Export all results
+                </pre>
+            </div>
+        </section>
+        <!-- Section 12: Code Examples -->
+        <section id="code-examples" class="section">
+            <h2>12. Code Examples</h2>
+            
+            <h3>Example 1: Making API Calls with Fetch</h3>
+            <pre><code>// GET request with authentication
+async function fetchUserQuizzes() {
+  try {
+    const response = await fetch(`${API}/api/quiz/my`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const quizzes = await response.json();
+    return quizzes;
+  } catch (error) {
+    console.error('Error fetching quizzes:', error);
+    throw error;
+  }
+}
+
+// POST request with JSON body
+async function createQuiz(quizData) {
+  try {
+    const response = await fetch(`${API}/api/quiz/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(quizData)
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.msg || 'Failed to create quiz');
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('Error creating quiz:', error);
+    throw error;
+  }
+}</code></pre>
+            
+            <h3>Example 2: Form Validation</h3>
+            <pre><code>function validateQuizForm() {
+  const title = document.getElementById('testTitle').value.trim();
+  const description = document.getElementById('testDesc').value.trim();
+  const duration = document.getElementById('testDuration').value;
+  
+  // Check required fields
+  if (!title) {
+    showError('Quiz title is required');
+    return false;
+  }
+  
+  if (title.length < 3 || title.length > 100) {
+    showError('Title must be between 3 and 100 characters');
+    return false;
+  }
+  
+  if (!description) {
+    showError('Quiz description is required');
+    return false;
+  }
+  
+  if (!duration || duration < 1 || duration > 480) {
+    showError('Duration must be between 1 and 480 minutes');
+    return false;
+  }
+  
+  if (questions.length === 0) {
+    showError('Please add at least one question');
+    return false;
+  }
+  
+  return true;
+}
+
+function showError(message) {
+  const msgElement = document.getElementById('msg');
+  msgElement.textContent = message;
+  msgElement.style.color = 'red';
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    msgElement.textContent = '';
+  }, 5000);
+}</code></pre>
+            
+            <h3>Example 3: Error Handling Pattern</h3>
+            <pre><code>async function performAction() {
+  const button = event.target;
+  
+  // Disable button during operation
+  button.disabled = true;
+  button.textContent = 'Loading...';
+  
+  try {
+    const response = await fetch(`${API}/api/endpoint`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      // Handle specific error codes
+      if (response.status === 401) {
+        // Unauthorized - redirect to login
+        localStorage.removeItem('token');
+        location.href = 'auth.html';
+        return;
+      }
+      
+      throw new Error(result.msg || 'Operation failed');
+    }
+    
+    // Success
+    showSuccess('Operation completed successfully!');
+    
+  } catch (error) {
+    console.error('Error:', error);
+    showError(error.message || 'An unexpected error occurred');
+  } finally {
+    // Re-enable button
+    button.disabled = false;
+    button.textContent = 'Submit';
+  }
+}</code></pre>
+            
+            <h3>Example 4: DOM Manipulation</h3>
+            <pre><code>function renderQuizCards(quizzes) {
+  const container = document.getElementById('quizGrid');
+  
+  // Clear existing content
+  container.innerHTML = '';
+  
+  if (quizzes.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <h3>No quizzes found</h3>
+        <p>Create your first quiz to get started!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Create cards for each quiz
+  quizzes.forEach(quiz => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.onclick = () => openQuiz(quiz.code);
+    
+    // Sanitize content
+    const safeTitle = sanitizeHTML(quiz.title);
+    const safeDesc = sanitizeHTML(quiz.description);
+    
+    card.innerHTML = `
+      <h3>${safeTitle}</h3>
+      <p>${safeDesc}</p>
+      <span class="status ${quiz.status}">
+        ${quiz.status.toUpperCase()}
+      </span>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+function sanitizeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}</code></pre>
+            
+            <h3>Example 5: Local Storage Usage</h3>
+            <pre><code>// Save data
+function saveToLocalStorage(key, value) {
+  try {
+    const jsonString = JSON.stringify(value);
+    localStorage.setItem(key, jsonString);
+  } catch (error) {
+    console.error('Error saving to localStorage:', error);
+  }
+}
+
+// Retrieve data
+function getFromLocalStorage(key, defaultValue = null) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return defaultValue;
+  }
+}
+
+// Remove data
+function removeFromLocalStorage(key) {
+  localStorage.removeItem(key);
+}
+
+// Usage examples
+const token = localStorage.getItem('token');
+const joiner = JSON.parse(localStorage.getItem('joiner') || '{}');
+localStorage.setItem('token', jwtToken);
+localStorage.removeItem('token'); // Logout</code></pre>
+        </section>
+
+        <!-- Section 13: Best Practices -->
+        <section id="best-practices" class="section">
+            <h2>13. Best Practices Used</h2>
+            
+            <h3>Code Organization</h3>
+            <ul>
+                <li><strong>Separation of Concerns:</strong> Each page has its own JavaScript file</li>
+                <li><strong>Modular CSS:</strong> Page-specific stylesheets with shared base styles</li>
+                <li><strong>Consistent Naming:</strong> camelCase for JS variables/functions, kebab-case for CSS classes</li>
+                <li><strong>File Structure:</strong> Organized by type (js/, css/, html files in root)</li>
+            </ul>
+            
+            <h3>Error Handling Patterns</h3>
+            <ul>
+                <li><strong>Try-Catch Blocks:</strong> All async operations wrapped in try-catch</li>
+                <li><strong>User Feedback:</strong> Clear error messages displayed to users</li>
+                <li><strong>Graceful Degradation:</strong> App continues working even if non-critical features fail</li>
+                <li><strong>Console Logging:</strong> Errors logged to console for debugging (should be removed in production)</li>
+            </ul>
+            
+            <h3>Async/Await Usage</h3>
+            <ul>
+                <li>Preferred over promise chains for readability</li>
+                <li>Always include try-catch for error handling</li>
+                <li>Proper use of await for sequential operations</li>
+                <li>Parallel operations with Promise.all when appropriate</li>
+            </ul>
+            
+            <h3>Input Validation</h3>
+            <ul>
+                <li><strong>Client-Side:</strong> Immediate feedback, better UX</li>
+                <li><strong>Server-Side:</strong> Security layer, never trust client</li>
+                <li><strong>Sanitization:</strong> All inputs sanitized before display or storage</li>
+                <li><strong>Type Checking:</strong> Validate data types and formats</li>
+            </ul>
+            
+            <h3>Responsive Design Principles</h3>
+            <ul>
+                <li>Mobile-first approach</li>
+                <li>Flexbox and Grid for layouts</li>
+                <li>Media queries for different screen sizes</li>
+                <li>Touch-friendly interface elements</li>
+                <li>Readable font sizes on all devices</li>
+            </ul>
+            
+            <h3>Performance Optimization</h3>
+            <ul>
+                <li><strong>Minimize DOM Manipulation:</strong> Batch updates where possible</li>
+                <li><strong>Cache DOM Queries:</strong> Store frequently accessed elements</li>
+                <li><strong>Debounce Search:</strong> Wait for user to finish typing</li>
+                <li><strong>Lazy Loading:</strong> Load data only when needed</li>
+                <li><strong>Image Optimization:</strong> Use Cloudinary for automatic optimization</li>
+            </ul>
+            
+            <h3>Security Best Practices</h3>
+            <ul>
+                <li>All user input sanitized</li>
+                <li>Passwords never stored in plain text</li>
+                <li>JWT tokens for authentication</li>
+                <li>HTTPS enforced in production</li>
+                <li>Rate limiting on sensitive endpoints</li>
+                <li>CORS properly configured</li>
+            </ul>
+            
+            <h3>Code Comments</h3>
+            <ul>
+                <li>Function documentation with JSDoc-style comments</li>
+                <li>Section dividers for organization</li>
+                <li>Inline comments for complex logic</li>
+                <li>TODO comments for future improvements</li>
+            </ul>
+        </section>
+
+        <!-- Section 14: Future Enhancements -->
+        <section id="future" class="section">
+            <h2>14. Future Enhancements</h2>
+            
+            <h3>Real-time Features (WebSockets)</h3>
+            <ul>
+                <li>Replace polling with WebSocket connections</li>
+                <li>Live participant count on creator dashboard</li>
+                <li>Real-time quiz progress tracking</li>
+                <li>Instant result updates as participants submit</li>
+                <li>Live leaderboard during quiz</li>
+            </ul>
+            
+            <h3>Advanced Analytics</h3>
+            <ul>
+                <li>Question-wise difficulty analysis</li>
+                <li>Time spent per question</li>
+                <li>Most missed questions identification</li>
+                <li>Performance trends over time</li>
+                <li>Comparison charts and graphs</li>
+                <li>Export analytics to Excel/CSV</li>
+            </ul>
+            
+            <h3>Enhanced Quiz Features</h3>
+            <ul>
+                <li>Multiple question types (true/false, matching, fill-in-blank)</li>
+                <li>Question pools with random selection</li>
+                <li>Adaptive difficulty based on performance</li>
+                <li>Partial credit for multiple correct answers</li>
+                <li>Question explanation after submission</li>
+                <li>Rich media support (images, videos in questions)</li>
+            </ul>
+            
+            <h3>Collaboration Features</h3>
+            <ul>
+                <li>Share quizzes with other creators</li>
+                <li>Quiz templates library</li>
+                <li>Collaborative quiz editing</li>
+                <li>Comments and feedback on questions</li>
+                <li>Public quiz marketplace</li>
+            </ul>
+            
+            <h3>Email & Notifications</h3>
+            <ul>
+                <li>Email notifications for quiz start</li>
+                <li>Results sent to participant emails</li>
+                <li>Reminder emails before quiz deadline</li>
+                <li>Weekly summary reports for creators</li>
+                <li>Browser push notifications</li>
+            </ul>
+            
+            <h3>Social & Gamification</h3>
+            <ul>
+                <li>Share results on social media</li>
+                <li>Achievement badges</li>
+                <li>Participant profiles with history</li>
+                <li>Global leaderboards</li>
+                <li>Quiz challenges between users</li>
+            </ul>
+            
+            <h3>Mobile App</h3>
+            <ul>
+                <li>Native iOS and Android apps</li>
+                <li>Offline quiz taking with sync</li>
+                <li>Better mobile experience</li>
+                <li>Push notifications</li>
+            </ul>
+            
+            <h3>Integration & API</h3>
+            <ul>
+                <li>LMS integration (Canvas, Moodle, Blackboard)</li>
+                <li>Google Classroom integration</li>
+                <li>Microsoft Teams integration</li>
+                <li>Public API for third-party developers</li>
+                <li>Webhook support for events</li>
+            </ul>
+            
+            <h3>Advanced Security</h3>
+            <ul>
+                <li>Two-factor authentication</li>
+                <li>Proctoring with webcam monitoring</li>
+                <li>IP address restrictions</li>
+                <li>Plagiarism detection</li>
+                <li>Screen recording prevention</li>
+            </ul>
+            
+            <h3>Accessibility Improvements</h3>
+            <ul>
+                <li>Screen reader optimization</li>
+                <li>Keyboard-only navigation</li>
+                <li>High contrast mode</li>
+                <li>Font size adjustments</li>
+                <li>Multiple language support (i18n)</li>
+            </ul>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>Quiz Master is a comprehensive online quiz platform built with modern web technologies. It demonstrates best practices in web development including:</p>
+            <ul>
+                <li>Clean, modular code architecture</li>
+                <li>Secure authentication and data handling</li>
+                <li>Responsive, user-friendly design</li>
+                <li>RESTful API design</li>
+                <li>Modern JavaScript (ES6+) features</li>
+                <li>Proper error handling and validation</li>
+            </ul>
+            <p>The platform is designed to be scalable, maintainable, and extensible for future enhancements. Whether you're a developer looking to understand the codebase or a user wanting to know how features work, this documentation provides comprehensive guidance.</p>
+            <div style="text-align: center; margin-top: 2rem;">
+                <p><strong>Developed by Maviya Attar</strong></p>
+                <p>For questions or contributions, please refer to the GitHub repository.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        ↑
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        /* ==========================================
+           QUIZ MASTER DOCUMENTATION - JAVASCRIPT
+           All Internal JavaScript for Interactivity
+           ========================================== */
+        
+        // Smooth Scrolling for Navigation Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Highlight Current Section in Sidebar
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.sidebar a');
+        
+        function highlightNavigation() {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.style.background = '';
+                link.style.color = '';
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.style.background = 'var(--bg)';
+                    link.style.color = 'var(--primary)';
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', highlightNavigation);
+        
+        // Tab Functionality (if any tabs are added)
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // Add active class to clicked tab and its content
+                tab.classList.add('active');
+                const targetContent = document.getElementById(target);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+        
+        // Code Block Copy Functionality
+        document.querySelectorAll('pre code').forEach(block => {
+            // Add copy button to code blocks
+            const button = document.createElement('button');
+            button.textContent = 'Copy';
+            button.className = 'copy-code-btn';
+            button.style.cssText = `
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                padding: 4px 12px;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            `;
+            
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+            
+            pre.addEventListener('mouseenter', () => {
+                button.style.opacity = '1';
+            });
+            
+            pre.addEventListener('mouseleave', () => {
+                button.style.opacity = '0';
+            });
+            
+            button.addEventListener('click', () => {
+                const text = block.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    button.textContent = 'Copied!';
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                    }, 2000);
+                });
+            });
+        });
+        
+        // Search Functionality (Future Enhancement)
+        function initSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                sections.forEach(section => {
+                    const text = section.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Initialize
+        highlightNavigation();
+        
+        // Print Styles Handler
+        window.addEventListener('beforeprint', () => {
+            document.querySelector('.sidebar').style.display = 'none';
+            document.querySelector('.main-content').style.marginLeft = '0';
+        });
+        
+        window.addEventListener('afterprint', () => {
+            document.querySelector('.sidebar').style.display = 'block';
+            document.querySelector('.main-content').style.marginLeft = '280px';
+        });
+        
+        console.log('Quiz Master Technical Documentation Loaded ✓');
+        console.log('Navigate using the sidebar or scroll to explore all sections');
+    </script>
+</body>
+</html>

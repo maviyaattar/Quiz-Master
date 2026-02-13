@@ -5,7 +5,7 @@
    ============================================ */
 
 /* ===== CONFIGURATION ===== */
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const API = "https://quiz-backend-production-8344.up.railway.app";
 
 /* ===== STATE MANAGEMENT ===== */
 let verifiedCode = null;
@@ -25,6 +25,11 @@ function backToStep1() {
   document.getElementById("step1").style.display = "block";
   document.getElementById("step2").style.display = "none";
   verifiedCode = null;
+  
+  // Reset progress indicator
+  document.getElementById("progressStep2").classList.remove("active");
+  document.getElementById("progressStep1").classList.add("active");
+  
   showMessage("", "info");
 }
 
@@ -94,6 +99,11 @@ async function verifyCode() {
         document.getElementById("step2").style.display = "block";
         document.getElementById("quizCodeDisplay").innerHTML = 
           `<strong>Quiz Code:</strong> <span class="code-badge">${escapeHtml(code)}</span>`;
+        
+        // Update progress indicator
+        document.getElementById("progressStep1").classList.remove("active");
+        document.getElementById("progressStep2").classList.add("active");
+        
         document.getElementById("name").focus();
         showMessage("", "info");
       }, 800);

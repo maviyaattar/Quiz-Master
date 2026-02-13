@@ -39,11 +39,28 @@
 
     <div class="card">
       <!-- Header -->
-      <div class="brand">Enter Quiz Code</div>
+      <div class="brand">
+        <i class="fas fa-graduation-cap"></i> Join Quiz
+      </div>
+      
+      <!-- Progress Indicator -->
+      <div class="progress-indicator">
+        <div class="progress-step active" id="progressStep1">
+          <div class="step-number">1</div>
+          <div class="step-label">Enter Code</div>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="progressStep2">
+          <div class="step-number">2</div>
+          <div class="step-label">Your Details</div>
+        </div>
+      </div>
       
       <!-- Step 1: Enter Quiz Code -->
       <div id="step1" class="step-container">
-        <div class="subtitle">Enter quiz code to join</div>
+        <div class="subtitle">
+          <i class="fas fa-qrcode"></i> Enter the quiz code provided by your instructor
+        </div>
         
         <input
           class="input"
@@ -62,22 +79,24 @@
           aria-label="Verify quiz code"
           type="button"
         >
-          <i class="fa fa-arrow-right"></i> Continue
+          <i class="fas fa-arrow-right"></i> Continue
         </button>
 
         <!-- Helper Text -->
         <div class="helper-text">
-          Not registered? <a href="auth.html">Create an account</a>
+          <i class="fas fa-info-circle"></i> Don't have a code? Ask your instructor
         </div>
       </div>
 
       <!-- Step 2: Enter Student Details (Hidden Initially) -->
       <div id="step2" class="step-container" style="display: none;">
         <button class="back-link" onclick="backToStep1()">
-          <i class="fa fa-arrow-left"></i> Change Code
+          <i class="fas fa-arrow-left"></i> Change Code
         </button>
         
-        <div class="subtitle" style="margin-top: 10px;">Enter your details</div>
+        <div class="subtitle" style="margin-top: 10px;">
+          <i class="fas fa-user-edit"></i> Tell us about yourself
+        </div>
         <div class="quiz-code-display" id="quizCodeDisplay"></div>
 
         <input
@@ -88,6 +107,7 @@
           maxlength="50"
           aria-label="Your name"
           autocomplete="name"
+          required
         />
         <input
           class="input"
@@ -97,6 +117,7 @@
           maxlength="20"
           aria-label="Your roll number"
           autocomplete="off"
+          required
         />
         <input
           class="input"
@@ -114,7 +135,7 @@
           aria-label="Join quiz"
           type="button"
         >
-          <i class="fa fa-check"></i> Join Quiz
+          <i class="fas fa-check-circle"></i> Join Quiz
         </button>
       </div>
 

@@ -3,7 +3,7 @@
    ========================================== */
 
 // Configuration
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const API = "https://quiz-backend-production-8344.up.railway.app";
 const token = localStorage.getItem("token");
 
 // Check authentication
@@ -55,12 +55,23 @@ async function loadQuizzes() {
       const description = sanitizeHTML(q.description || "No description");
       const status = sanitizeHTML(q.status);
 
+      // Get status icon
+      let statusIcon = 'fa-file-alt';
+      if (status === 'live') statusIcon = 'fa-broadcast-tower';
+      if (status === 'ended') statusIcon = 'fa-check-circle';
+
       div.innerHTML = `
+        <div class="quiz-card-header">
+          <span class="status ${status}">
+            <i class="fas ${statusIcon}"></i> ${status.toUpperCase()}
+          </span>
+        </div>
         <h3>${title}</h3>
         <p>${description}</p>
-        <span class="status ${status}">
-          ${status.toUpperCase()}
-        </span>
+        <div class="quiz-card-footer">
+          <span class="quiz-code"><i class="fas fa-qrcode"></i> ${sanitizeHTML(q.code)}</span>
+          <span class="view-link">View Details <i class="fas fa-arrow-right"></i></span>
+        </div>
       `;
 
       grid.appendChild(div);

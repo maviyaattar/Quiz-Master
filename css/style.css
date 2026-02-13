@@ -112,58 +112,152 @@ a:hover {
 
 /* ========== LANDING ========== */
 .hero{
-  padding:90px 20px 60px;
+  padding:120px 20px 80px;
   text-align:center;
   animation:fadeDown .8s ease;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(91, 108, 255, 0.1), rgba(143, 91, 255, 0.1));
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 24px;
+  border: 1px solid rgba(91, 108, 255, 0.2);
+  animation: fadeIn 1s ease;
 }
 
 .hero h1{
-  font-size:48px;
-  font-weight:700;
-  margin-bottom: 16px;
-}
-
-.hero h1 span{
+  font-size:56px;
+  font-weight:800;
+  margin-bottom: 20px;
+  line-height: 1.2;
   background:linear-gradient(135deg,var(--primary),var(--secondary));
   -webkit-background-clip:text;
   -webkit-text-fill-color: transparent;
   background-clip:text;
-  color:transparent;
+  animation: fadeIn 1.2s ease;
 }
 
-.hero p{
-  margin-top:14px;
-  color:var(--muted);
-  max-width:520px;
-  margin-inline:auto;
+.hero-subtitle {
+  margin-top: 16px;
+  color: var(--muted);
+  max-width: 640px;
+  margin-inline: auto;
   font-size: 18px;
+  line-height: 1.6;
+  animation: fadeIn 1.4s ease;
 }
 
 .hero-actions{
-  margin-top:35px;
+  margin-top:40px;
   display:flex;
   justify-content:center;
-  gap:18px;
+  gap:20px;
   flex-wrap:wrap;
+  animation: fadeIn 1.6s ease;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 60px;
+  flex-wrap: wrap;
+  animation: fadeIn 1.8s ease;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-item i {
+  font-size: 32px;
+  color: var(--primary);
+}
+
+.stat-item div {
+  text-align: left;
+}
+
+.stat-item strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-item span {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 /* ========== ROLES ========== */
 .roles{
-  max-width:1000px;
-  margin:40px auto 80px;
+  max-width:1100px;
+  margin:60px auto 100px;
   padding:0 20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:30px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+  animation: fadeIn 0.8s ease;
+}
+
+.section-header h2 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section-header p {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
 }
 
 .role-card{
-  padding:40px 30px;
-  border-radius:24px;
-  text-align:center;
+  padding:40px 32px;
+  border-radius:20px;
   cursor:pointer;
   transition: var(--transition);
   animation: fadeInUp 0.6s ease forwards;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.role-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.role-card:hover::before {
+  transform: scaleX(1);
 }
 
 .role-card:nth-child(1) {
@@ -174,31 +268,92 @@ a:hover {
   animation-delay: 0.2s;
 }
 
-.role-card i{
-  font-size:44px;
-  margin-bottom:20px;
+.role-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(91, 108, 255, 0.1), rgba(143, 91, 255, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  transition: var(--transition);
+}
+
+.role-icon i{
+  font-size:38px;
   color:var(--primary);
   transition: var(--transition);
 }
 
 .role-card h3 {
-  margin-bottom: 10px;
-  font-size: 22px;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: left;
 }
 
-.role-card p{
+.role-card > p{
   color:var(--muted);
   font-size:14px;
+  line-height: 1.6;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.feature-list i {
+  color: #22c55e;
+  font-size: 14px;
+}
+
+.card-action {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: left;
+  font-weight: 600;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-action i {
+  transition: transform 0.3s ease;
 }
 
 .role-card:hover{
   transform:translateY(-8px);
-  box-shadow:0 30px 60px rgba(0,0,0,.15);
+  box-shadow:0 35px 70px rgba(0,0,0,.15);
 }
 
-.role-card:hover i {
-  transform: scale(1.1);
-  color: var(--secondary);
+.role-card:hover .role-icon {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.role-card:hover .role-icon i {
+  color: #fff;
+}
+
+.role-card:hover .card-action i {
+  transform: translateX(5px);
 }
 
 /* ========== AUTH ========== */
@@ -212,9 +367,30 @@ a:hover {
 
 .auth-box{
   width:100%;
-  max-width:420px;
-  padding:35px;
+  max-width:460px;
+  padding:40px;
   animation:fadeUp .7s ease;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-header p {
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .auth-tabs{
@@ -223,6 +399,7 @@ a:hover {
   border-radius:40px;
   overflow:hidden;
   margin-bottom:30px;
+  padding: 4px;
 }
 
 .auth-tabs button{
@@ -234,6 +411,11 @@ a:hover {
   cursor:pointer;
   color:var(--muted);
   transition: var(--transition);
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .auth-tabs button.active{

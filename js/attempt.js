@@ -3,7 +3,7 @@
    ========================================== */
 
 // Configuration
-const API = "https://quiz-backend-production-4aaf.up.railway.app";
+const API = "https://quiz-backend-production-8344.up.railway.app";
 const code = new URLSearchParams(location.search).get("code");
 const joiner = JSON.parse(localStorage.getItem("joiner"));
 
@@ -144,7 +144,7 @@ const poll = setInterval(async () => {
     }
   } catch (err) {
     // Keep waiting silently, don't show error to user
-    console.log('Waiting for quiz to start...');
+    // Polling will continue until quiz starts
   }
 }, 3000);
 
@@ -326,8 +326,8 @@ async function submit(isTimerTriggered = false) {
     try {
       result = await response.json();
     } catch (parseErr) {
-      // Response is not JSON, but that's okay for successful submissions
-      console.log('Submission completed, status:', response.status);
+      // Response is not JSON, but submission was recorded
+      // Status: response.status
     }
 
     // Hide loading overlay
@@ -336,7 +336,7 @@ async function submit(isTimerTriggered = false) {
     // If timer triggered submission, always show thank you screen
     // Backend has received the attempt regardless of response status
     if (isTimerTriggered) {
-      console.log('Timer expired - quiz attempt recorded');
+      // Timer expired - quiz attempt recorded
       const elements = cacheElements();
       elements.quizScreen.classList.add("hide");
       elements.thankScreen.classList.remove("hide");
@@ -359,7 +359,7 @@ async function submit(isTimerTriggered = false) {
     }
 
     // Submission successful - show thank you screen
-    console.log('Quiz submitted successfully:', result);
+    // Quiz submitted successfully
     
     // Use cached elements
     const elements = cacheElements();
@@ -372,7 +372,7 @@ async function submit(isTimerTriggered = false) {
     // If timer triggered, still show thank you screen
     // The attempt was made even if network failed
     if (isTimerTriggered) {
-      console.log('Timer expired - showing completion screen despite error');
+      // Timer expired - showing completion screen despite error
       hideLoadingState();
       const elements = cacheElements();
       elements.quizScreen.classList.add("hide");
