@@ -136,10 +136,10 @@ function renderQuestions() {
           <div class="question-header">
             <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
             <div class="question-actions">
-              <i class="fa fa-pen" onclick="editQuestion(${i})" 
+              <i class="fas fa-edit" onclick="editQuestion(${i})" 
                  role="button" tabindex="0" aria-label="Edit question ${i + 1}"
                  title="Edit question"></i>
-              <i class="fa fa-trash delete" onclick="deleteQuestion(${i})" 
+              <i class="fas fa-trash-alt delete" onclick="deleteQuestion(${i})" 
                  role="button" tabindex="0" aria-label="Delete question ${i + 1}"
                  title="Delete question"></i>
             </div>
@@ -835,10 +835,10 @@ function renderAIQuestions() {
           <div class="question-header">
             <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
             <div class="question-actions">
-              <i class="fa fa-pen" onclick="editAIQuestion(${i})" 
+              <i class="fas fa-edit" onclick="editAIQuestion(${i})" 
                  role="button" tabindex="0" aria-label="Edit question ${i + 1}"
                  title="Edit question"></i>
-              <i class="fa fa-trash delete" onclick="deleteAIQuestion(${i})" 
+              <i class="fas fa-trash-alt delete" onclick="deleteAIQuestion(${i})" 
                  role="button" tabindex="0" aria-label="Delete question ${i + 1}"
                  title="Delete question"></i>
             </div>

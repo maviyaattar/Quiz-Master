@@ -37,26 +37,84 @@
 <body>
 
 <section class="hero">
-  <h1>Online Quiz Platform</h1>
-  <p>Create quizzes, host live tests and view instant results.</p>
+  <div class="hero-badge">
+    <i class="fas fa-sparkles"></i> Professional Quiz Platform
+  </div>
+  <h1>Transform Your Quiz Experience</h1>
+  <p class="hero-subtitle">Create, manage, and analyze quizzes with powerful AI assistance. Perfect for educators, trainers, and organizations.</p>
 
   <div class="hero-actions">
-    <a class="btn btn-primary" href="auth.html">Get Started</a>
-    <a class="btn btn-outline" href="#roles">Explore</a>
+    <a class="btn btn-primary" href="auth.html">
+      <i class="fas fa-rocket"></i> Get Started Free
+    </a>
+    <a class="btn btn-outline" href="#roles">
+      <i class="fas fa-compass"></i> Explore Features
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <i class="fas fa-users"></i>
+      <div>
+        <strong>10K+</strong>
+        <span>Active Users</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-chart-line"></i>
+      <div>
+        <strong>50K+</strong>
+        <span>Quizzes Created</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-star"></i>
+      <div>
+        <strong>4.9/5</strong>
+        <span>User Rating</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="roles" id="roles">
-  <div class="role-card card" onclick="location.href='auth.html'">
-    <i class="fa-solid fa-chalkboard-user"></i>
-    <h3>Creator</h3>
-    <p>Create and manage quizzes professionally.</p>
+  <div class="section-header">
+    <h2>Choose Your Role</h2>
+    <p>Whether you're creating quizzes or taking them, we've got you covered</p>
   </div>
 
-  <div class="role-card card" onclick="location.href='join.html'">
-    <i class="fa-solid fa-user-graduate"></i>
-    <h3>Join Quiz</h3>
-    <p>Enter code, attempt quiz and submit answers.</p>
+  <div class="roles-grid">
+    <div class="role-card card" onclick="location.href='auth.html'">
+      <div class="role-icon">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <h3>Quiz Creator</h3>
+      <p>Create and manage professional quizzes with AI assistance. Track results and analyze performance.</p>
+      <ul class="feature-list">
+        <li><i class="fas fa-check"></i> AI-powered quiz generation</li>
+        <li><i class="fas fa-check"></i> Real-time analytics</li>
+        <li><i class="fas fa-check"></i> Custom branding</li>
+      </ul>
+      <div class="card-action">
+        <span>Get Started <i class="fas fa-arrow-right"></i></span>
+      </div>
+    </div>
+
+    <div class="role-card card" onclick="location.href='join.html'">
+      <div class="role-icon">
+        <i class="fa-solid fa-user-graduate"></i>
+      </div>
+      <h3>Quiz Participant</h3>
+      <p>Join quizzes instantly with a code. Take tests and get immediate feedback on your performance.</p>
+      <ul class="feature-list">
+        <li><i class="fas fa-check"></i> Easy code-based joining</li>
+        <li><i class="fas fa-check"></i> Instant results</li>
+        <li><i class="fas fa-check"></i> PDF certificates</li>
+      </ul>
+      <div class="card-action">
+        <span>Join Quiz <i class="fas fa-arrow-right"></i></span>
+      </div>
+    </div>
   </div>
 </section>
 

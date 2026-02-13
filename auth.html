@@ -31,40 +31,52 @@
 
 <div class="auth-wrapper">
   <div class="auth-box card">
+    <div class="auth-header">
+      <h2>Welcome to Quiz Master</h2>
+      <p>Sign in to create amazing quizzes or join exciting tests</p>
+    </div>
 
     <div class="auth-tabs">
-      <button id="loginTab" class="active" onclick="switchAuth('login')">Login</button>
-      <button id="registerTab" onclick="switchAuth('register')">Register</button>
+      <button id="loginTab" class="active" onclick="switchAuth('login')">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+      <button id="registerTab" onclick="switchAuth('register')">
+        <i class="fas fa-user-plus"></i> Register
+      </button>
     </div>
 
     <!-- LOGIN -->
     <form id="loginForm" onsubmit="login(event)">
       <div class="input-group">
         <i class="fa fa-envelope"></i>
-        <input id="email" class="input" placeholder="Email">
+        <input id="email" class="input" placeholder="Email" type="email" required>
       </div>
       <div class="input-group">
         <i class="fa fa-lock"></i>
-        <input id="password" type="password" class="input" placeholder="Password">
+        <input id="password" type="password" class="input" placeholder="Password" required minlength="6">
       </div>
-      <button class="btn btn-primary">Login</button>
+      <button class="btn btn-primary" type="submit">
+        <i class="fas fa-arrow-right"></i> Login
+      </button>
     </form>
 
     <!-- REGISTER -->
     <form id="registerForm" style="display:none" onsubmit="registerUser(event)">
       <div class="input-group">
         <i class="fa fa-user"></i>
-        <input id="rname" class="input" placeholder="Full name">
+        <input id="rname" class="input" placeholder="Full name" required minlength="2">
       </div>
       <div class="input-group">
         <i class="fa fa-envelope"></i>
-        <input id="remail" class="input" placeholder="Email">
+        <input id="remail" class="input" placeholder="Email" type="email" required>
       </div>
       <div class="input-group">
         <i class="fa fa-lock"></i>
-        <input id="rpassword" type="password" class="input" placeholder="Password">
+        <input id="rpassword" type="password" class="input" placeholder="Password (min 6 characters)" required minlength="6">
       </div>
-      <button class="btn btn-primary">Create Account</button>
+      <button class="btn btn-primary" type="submit">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
     </form>
 
     <p class="msg" id="msg"></p>
