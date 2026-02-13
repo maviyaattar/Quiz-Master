@@ -136,13 +136,9 @@ function renderQuestions() {
           <div class="question-header">
             <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
             <div class="question-actions">
-              <i class="fas fa-edit" onclick="editQuestion(${i})" 
-                 role="button" tabindex="0" aria-label="Edit question ${i + 1}"
-                 title="Edit question"></i>
-              <i class="fas fa-trash-alt delete" onclick="deleteQuestion(${i})" 
-                 role="button" tabindex="0" aria-label="Delete question ${i + 1}"
-                 title="Delete question"></i>
-            </div>
+  <button onclick="editQuestion(${i})">Edit</button>
+  <button onclick="deleteQuestion(${i})">Delete</button>
+</div>
           </div>
           <div class="correct">
             Correct Option: <strong>${correctLabel}</strong>
