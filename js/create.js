@@ -135,11 +135,50 @@ function renderQuestions() {
         <div class="question-item" role="article" aria-label="Question ${i + 1}">
           <div class="question-header">
             <strong>Q${i + 1}. ${escapeHtml(q.text)}</strong>
-            <div class="question-actions">
-  <button onclick="editQuestion(${i})">Edit</button>
-  <button onclick="deleteQuestion(${i})">Delete</button>
-</div>
+
+            <div style="display:flex; gap:8px; flex-shrink:0;">
+
+              <button 
+                onclick="editQuestion(${i})"
+                style="
+                  padding:6px 12px;
+                  border-radius:8px;
+                  font-size:13px;
+                  font-weight:600;
+                  border:1px solid #2563eb;
+                  background:#e0f2fe;
+                  color:#2563eb;
+                  cursor:pointer;
+                  transition:0.2s ease;
+                "
+                onmouseover="this.style.background='#2563eb';this.style.color='white';"
+                onmouseout="this.style.background='#e0f2fe';this.style.color='#2563eb';"
+              >
+                Edit
+              </button>
+
+              <button 
+                onclick="deleteQuestion(${i})"
+                style="
+                  padding:6px 12px;
+                  border-radius:8px;
+                  font-size:13px;
+                  font-weight:600;
+                  border:1px solid #dc2626;
+                  background:#fee2e2;
+                  color:#dc2626;
+                  cursor:pointer;
+                  transition:0.2s ease;
+                "
+                onmouseover="this.style.background='#dc2626';this.style.color='white';"
+                onmouseout="this.style.background='#fee2e2';this.style.color='#dc2626';"
+              >
+                Delete
+              </button>
+
+            </div>
           </div>
+
           <div class="correct">
             Correct Option: <strong>${correctLabel}</strong>
           </div>
@@ -148,7 +187,6 @@ function renderQuestions() {
     })
     .join("");
 }
-
 /* ===== QUESTION MANAGEMENT: EDIT ===== */
 /**
  * Load a question for editing
