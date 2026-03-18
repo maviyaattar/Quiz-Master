@@ -5,7 +5,7 @@
    ============================================ */
 
 /* ===== CONFIGURATION ===== */
-const API_BASE = "https://quiz-backend-production-8344.up.railway.app";
+const API_BASE = "https://portfolio-backend-api-8me4.onrender.com";
 const token = localStorage.getItem("token");
 
 // Redirect to auth if not authenticated
