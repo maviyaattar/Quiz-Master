@@ -1,0 +1,56 @@
+name: Generate PDF Report
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/REPORT.md'
+  workflow_dispatch:
+
+jobs:
+  build-pdf:
+    name: Convert REPORT.md → PDF
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc and wkhtmltopdf
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y pandoc wkhtmltopdf xvfb
+
+      - name: Generate PDF from Markdown
+        run: |
+          xvfb-run --auto-servernum pandoc docs/REPORT.md \
+            --from=markdown+yaml_metadata_block \
+            --to=html5 \
+            --standalone \
+            --metadata title="QuizMaster Project Report" \
+            --css=https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css \
+            -o /tmp/report.html
+
+          xvfb-run --auto-servernum wkhtmltopdf \
+            --enable-local-file-access \
+            --page-size A4 \
+            --margin-top 20mm \
+            --margin-right 20mm \
+            --margin-bottom 20mm \
+            --margin-left 20mm \
+            --encoding UTF-8 \
+            --title "QuizMaster Project Report" \
+            --footer-center "Page [page] of [topage]" \
+            --footer-font-size 9 \
+            /tmp/report.html \
+            QuizMaster-Project-Report.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuizMaster-Project-Report
+          path: QuizMaster-Project-Report.pdf
+          retention-days: 90
